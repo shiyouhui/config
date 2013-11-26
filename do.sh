@@ -12,12 +12,13 @@ SRCDIR=$PWD
 cd ->>null
 BOOTANIMATIONDIR=$CONFIGDIR/custom/开机动画
 SHUTANIMATIONDIR=$CONFIGDIR/custom/关机动画
+UBOOTLOGODIR=$CONFIGDIR/custom/第一屏
+KERNELLOGODIR=$CONFIGDIR/custom/第二屏
 PATCHDIR="$CONFIGDIR/patch"
 PROFILE=$SRCDIR/mediatek/config/$PROJECT/elink/$1
 CUSTOMCONF=$SRCDIR/mediatek/config/common/custom.conf
 DEFAULTXML=$SRCDIR/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
 CONFILE="$CONFIGDIR/config.ini"
-<<<<<<< HEAD
 BLUETOOTHNAME=`awk -F"=" '{if(/^蓝牙名称/)print $2}' $CONFILE`
 WLANSSID=`awk -F"=" '{if(/^共享SSID名称/)print $2}' $CONFILE`
 MODELNAME=`awk -F"=" '{if(/^机型名称/)print $2}' $CONFILE`
@@ -32,14 +33,18 @@ DISKLABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}
 ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
 HOMEPAGE=`awk -F"=" 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
 ACTIVEPROFILE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^情景模式/)print $2}' $CONFILE`
-SUBCAMERA=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^前摄像头插值/)print $2}' $CONFILE`
-MAINCAMERA=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^后摄像头插值/)print $2}' $CONFILE`
+SUBCAMERA=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^前摄像头插值/)print $2}' $CONFILE`
+MAINCAMERA=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^后摄像头插值/)print $2}' $CONFILE`
 BOOTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^开机动画/)print $2}' $CONFILE`
 BOOTFPS=`echo $BOOTANIMATION | awk '{print $1}'`
 BOOTTIMES=`echo $BOOTANIMATION | awk '{print $2}'`
 SHUTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^关机动画/)print $2}' $CONFILE`
 SHUTFPS=`echo $SHUTANIMATION | awk '{print $1}'`
 SHUTTIMES=`echo $SHUTANIMATION | awk '{print $2}'`
+UBOOTLOGO=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^第一屏/)print $2}' $CONFILE`
+KERNELLOGO=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^第二屏/)print $2}' $CONFILE`
+
+
 
 #修改蓝牙名称
 if [ ! -z "$BLUETOOTHNAME" ];then
@@ -183,7 +188,7 @@ if [ ! -z "$ACTIVEPROFILE" ];then
 	sed -i "/\"def_active_profile\"/s/>.*</>$RESULT</" $SRCDIR/frameworks/base/packages/SettingsProvider/res/values/mtk_defaults.xml
 fi
 
-#修改开机动画
+#制作动画
 makeanimation()
 {
 	if [ $1 = "boot" ];then
@@ -233,15 +238,59 @@ makeanimation()
 	zip ./$RESULT ./* ./desc.txt -r -0
 	cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
 	rm ../* -r
+	echo "make $RESULT successfully ===========> OK"
 	cd $CONFIGDIR
 }
 
+#开机动画
 if [ ! -z "$BOOTANIMATION" ];then
 	makeanimation boot;
-	echo "make $RESULT successfully ===========> OK"
 fi
 
+#关机动画
 if [ ! -z "$SHUTANIMATION" ];then
 	makeanimation shut;
-	echo "make $RESULT successfully ===========> OK"
 fi
+
+#开机logo
+makelogo()
+{
+	if [ $1 = "uboot" ];then
+		echo ">>>>>begin to make uboot logo"
+		cd $UBOOTLOGODIR
+	elif [ $1 = "kernel" ];then
+		echo ">>>>>begin to make kernel logo"
+		cd $KERNELLOGODIR
+	fi
+
+	if [ $PROJECT = "md706" ];then
+		if [ $DENSITY = "L" ];then
+			convert * cu_wvga_$1.bmp
+			cp -p *.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_wvga/
+			rm *
+		elif [ $DENSITY = "H" ];then  
+			convert * wsvga_$1.bmp
+			cp -p *.bmp $SRCDIR/mediatek/custom/common/lk/logo/wsvga/
+			rm *
+		fi
+	elif [ $PROJECT = "md790" ];then
+		echo "MD790"
+	fi
+	echo "make $1 logo  successfully ===========> OK"
+	cd $CONFIGDIR
+
+
+}
+
+
+
+#开机第一屏logo
+if [ ! -z "$UBOOTLOGO" ];then
+	makelogo uboot
+fi
+
+#开机第二屏logo
+if [ ! -z "$KERNELLOGO" ];then
+	makelogo kernel
+fi
+
