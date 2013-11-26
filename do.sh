@@ -29,7 +29,8 @@ INPUTMETHOD=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^默认输入法/)print 
 DISKLABEL=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}' $CONFILE`
 ONLINELABEL=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
 HOMEPAGE=`awk -F"= " 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
-
+ACTIVEPROFILE=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^情景模式/)print $2}' $CONFILE`
+echo $ACTIVEPROFILE
 #修改蓝牙名称
 if [ ! -z "$BLUETOOTHNAME" ];then
 	echo ">>>>>Configurate Bluetooth Name = $BLUETOOTHNAME "
@@ -114,4 +115,20 @@ if [ ! -z "$HOMEPAGE" ];then
 	sed -i "s/getFactoryResetHomeUrl(mContext)/\"$HOMEPAGE\"/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
 fi
 
+#修改默认情景模式
+if [ ! -z "$ACTIVEPROFILE" ];then
+	if [ "$ACTIVEPROFILE" = "标准" ];then
+		RESULT=mtk_audioprofile_general
+	elif [ "$ACTIVEPROFILE" = "静音" ];then
+		RESULT=mtk_audioprofile_silent
+	elif [ "$ACTIVEPROFILE" = "会议" ];then
+		RESULT=mtk_audioprofile_meeting
+	elif [ "$ACTIVEPROFILE" = "户外" ];then
+		RESULT=mtk_audioprofile_outdoor
+	else
+		echo "情景模式输入错误，请按可供选择输入(标准，静音，会议，户外)"
+	fi
+	echo ">>>>>Modify line_label = $ACTIVEPROFILE"
+	sed -i "/\"def_active_profile\"/s/>.*</>$RESULT</" $SRCDIR/frameworks/base/packages/SettingsProvider/res/values/mtk_defaults.xml
 
+fi
