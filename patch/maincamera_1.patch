@@ -1,0 +1,23 @@
+diff --git a/hal/camera/camera/cfg_ftbl_custom_yuv_main.h b/hal/camera/camera/cfg_ftbl_custom_yuv_main.h
+index 266cb11..cea9594 100755
+--- a/hal/camera/camera/cfg_ftbl_custom_yuv_main.h
++++ b/hal/camera/camera/cfg_ftbl_custom_yuv_main.h
+@@ -118,14 +118,12 @@ GETFINFO_YUV_MAIN()
+     )
+ #endif
+     //..........................................................................
+-#if 0
++#if 1
+     //  Capture Size
++    //ylht modify for camera chazhi back camera
+     CONFIG_FEATURE(FID_CAP_SIZE, 
+-        BY_DEFAULT(CAPTURE_SIZE_2560_1920), 
+-        CAPTURE_SIZE_320_240,   CAPTURE_SIZE_640_480, 
+-        CAPTURE_SIZE_1024_768,  CAPTURE_SIZE_1280_960, 
+-        CAPTURE_SIZE_1600_1200, CAPTURE_SIZE_2048_1536, 
+-        CAPTURE_SIZE_2560_1920
++        BY_DEFAULT(CAPTURE_SIZE_1600_1200),
++		CAPTURE_SIZE_320_240, CAPTURE_SIZE_640_480, CAPTURE_SIZE_1024_768, CAPTURE_SIZE_1280_960, CAPTURE_SIZE_1600_1200, CAPTURE_SIZE_2048_1536, CAPTURE_SIZE_2560_1920
+     )
+ #endif
+     //..........................................................................

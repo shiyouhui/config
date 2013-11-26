@@ -29,6 +29,9 @@ INPUTMETHOD=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^默认输入法/)print 
 DISKLABEL=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}' $CONFILE`
 ONLINELABEL=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
 HOMEPAGE=`awk -F"= " 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
+SUBCAMERA=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^前摄像头插值/)print $2}' $CONFILE`
+MAINCAMERA=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^后摄像头插值/)print $2}' $CONFILE`
+
 
 #修改蓝牙名称
 if [ ! -z "$BLUETOOTHNAME" ];then
@@ -114,4 +117,25 @@ if [ ! -z "$HOMEPAGE" ];then
 	sed -i "s/getFactoryResetHomeUrl(mContext)/\"$HOMEPAGE\"/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
 fi
 
+#修改前摄像头插值
+if  [ ! -z "$SUBCAMERA" ];then
+	echo ">>>>>Modify subcamera = $SUBCAMERA"
+	cd $SRCDIR/mediatek/custom/mt6577/
+	git apply $PATCHDIR/subcamera.patch
+	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $SUBCAMERA 14 10`),/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_sub.h
+	sed -i "/$SUBCAMERA,/s/$SUBCAMERA,.*/$SUBCAMERA/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_sub.h
+fi
 
+#修改后摄像头插值
+if  [ ! -z "$MAINCAMERA" ];then
+	echo ">>>>>Modify subcamera = $MAINCAMERA"
+	cd $SRCDIR/mediatek/custom/mt6577/
+	git apply $PATCHDIR/maincamera_1.patch
+	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $MAINCAMERA 14 10`),/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_main.h
+	sed -i "/$MAINCAMERA,/s/$MAINCAMERA,.*/$MAINCAMERA/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_main.h
+
+	cd $SRCDIR/mediatek/custom/$PROJECT/
+	git apply $PATCHDIR/maincamera_2.patch
+	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $MAINCAMERA 14 10`),/" $SRCDIR/mediatek/custom/$PROJECT/hal/camera/camera/cfg_ftbl_custom_raw_main.h
+	sed -i "/$MAINCAMERA,/s/$MAINCAMERA,.*/$MAINCAMERA/" $SRCDIR/mediatek/custom/$PROJECT/hal/camera/camera/cfg_ftbl_custom_raw_main.h
+fi
