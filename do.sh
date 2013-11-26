@@ -128,7 +128,7 @@ if  [ ! -z "$SUBCAMERA" ];then
 	else
 		echo "摄像头像素 30 200 500 万"
 	fi
-	echo ">>>>>Modify subcamera = $SUBCAMERA"
+	echo ">>>>>Modify subcamera = $SUBSIZE"
 	cd $SRCDIR/mediatek/custom/mt6577/
 	git apply $PATCHDIR/subcamera.patch
 	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $SUBSIZE 14 10`),/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_sub.h
