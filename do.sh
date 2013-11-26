@@ -17,6 +17,7 @@ PROFILE=$SRCDIR/mediatek/config/$PROJECT/elink/$1
 CUSTOMCONF=$SRCDIR/mediatek/config/common/custom.conf
 DEFAULTXML=$SRCDIR/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
 CONFILE="$CONFIGDIR/config.ini"
+<<<<<<< HEAD
 BLUETOOTHNAME=`awk -F"=" '{if(/^蓝牙名称/)print $2}' $CONFILE`
 WLANSSID=`awk -F"=" '{if(/^共享SSID名称/)print $2}' $CONFILE`
 MODELNAME=`awk -F"=" '{if(/^机型名称/)print $2}' $CONFILE`
@@ -31,6 +32,8 @@ DISKLABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}
 ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
 HOMEPAGE=`awk -F"=" 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
 ACTIVEPROFILE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^情景模式/)print $2}' $CONFILE`
+SUBCAMERA=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^前摄像头插值/)print $2}' $CONFILE`
+MAINCAMERA=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^后摄像头插值/)print $2}' $CONFILE`
 BOOTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^开机动画/)print $2}' $CONFILE`
 BOOTFPS=`echo $BOOTANIMATION | awk '{print $1}'`
 BOOTTIMES=`echo $BOOTANIMATION | awk '{print $2}'`
@@ -120,6 +123,47 @@ fi
 if [ ! -z "$HOMEPAGE" ];then
 	echo ">>>>>Modify default Browse Homepage = `expr substr $HOMEPAGE 10 20`"
 	sed -i "s/getFactoryResetHomeUrl(mContext)/\"$HOMEPAGE\"/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
+fi
+
+#修改前摄像头插值
+if  [ ! -z "$SUBCAMERA" ];then
+	if [ "$SUBCAMERA" = "30" ];then
+		SUBSIZE=CAPTURE_SIZE_640_480
+	elif [ "$SUBCAMERA" = "200" ];then
+		SUBSIZE=CAPTURE_SIZE_1600_1200
+	elif [ "$SUBCAMERA" = "500" ];then
+		SUBSIZE=CAPTURE_SIZE_2560_1920
+	else
+		echo "摄像头像素 30 200 500 万"
+	fi
+	echo ">>>>>Modify subcamera = $SUBSIZE"
+	cd $SRCDIR/mediatek/custom/mt6577/
+	git apply $PATCHDIR/subcamera.patch
+	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $SUBSIZE 14 10`),/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_sub.h
+	sed -i "/$SUBSIZE,/s/$SUBSIZE,.*/$SUBSIZE/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_sub.h
+fi
+
+#修改后摄像头插值
+if  [ ! -z "$MAINCAMERA" ];then
+	if [ "$MAINCAMERA" = "30" ];then
+		MAINSIZE=CAPTURE_SIZE_640_480
+	elif [ "$MAINCAMERA" = "200" ];then
+		MAINSIZE=CAPTURE_SIZE_1600_1200
+	elif [ "$MAINCAMERA" = "500" ];then
+		MAINSIZE=CAPTURE_SIZE_2560_1920
+	else
+		echo "摄像头像素 30 200 500 万"
+	fi
+	echo ">>>>>Modify subcamera = $MAINSIZE"
+	cd $SRCDIR/mediatek/custom/mt6577/
+	git apply $PATCHDIR/maincamera_1.patch
+	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $MAINSIZE 14 10`),/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_main.h
+	sed -i "/$MAINSIZE,/s/$MAINSIZE,.*/$MAINSIZE/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_main.h
+
+	cd $SRCDIR/mediatek/custom/$PROJECT/
+	git apply $PATCHDIR/maincamera_2.patch
+	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $MAINSIZE 14 10`),/" $SRCDIR/mediatek/custom/$PROJECT/hal/camera/camera/cfg_ftbl_custom_raw_main.h
+	sed -i "/$MAINSIZE,/s/$MAINSIZE,.*/$MAINSIZE/" $SRCDIR/mediatek/custom/$PROJECT/hal/camera/camera/cfg_ftbl_custom_raw_main.h
 fi
 
 #修改默认情景模式

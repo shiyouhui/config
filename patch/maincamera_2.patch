@@ -1,0 +1,20 @@
+diff --git a/hal/camera/camera/cfg_ftbl_custom_raw_main.h b/hal/camera/camera/cfg_ftbl_custom_raw_main.h
+index 1f0c4c1..516cc76 100755
+--- a/hal/camera/camera/cfg_ftbl_custom_raw_main.h
++++ b/hal/camera/camera/cfg_ftbl_custom_raw_main.h
+@@ -129,11 +129,10 @@ GETFINFO_RAW_MAIN()
+     //..........................................................................
+ #if 1
+     //  Capture Size
+-    CONFIG_FEATURE(FID_CAP_SIZE, 
+-        BY_DEFAULT(CAPTURE_SIZE_2560_1920), 
+-        CAPTURE_SIZE_640_480,
+-        CAPTURE_SIZE_1280_960, CAPTURE_SIZE_1600_1200,
+-        CAPTURE_SIZE_2048_1536, CAPTURE_SIZE_2560_1920
++    //ylht modify for camera chazhi back camera
++    CONFIG_FEATURE(FID_CAP_SIZE,
++		BY_DEFAULT(CAPTURE_SIZE_1600_1200),
++		CAPTURE_SIZE_640_480, CAPTURE_SIZE_1280_960, CAPTURE_SIZE_1600_1200, CAPTURE_SIZE_2048_1536, CAPTURE_SIZE_2560_1920
+     )
+ #endif
+     //..........................................................................
