@@ -10,27 +10,34 @@ CONFIGDIR=$PWD
 cd ../alps
 SRCDIR=$PWD
 cd ->>null
-
+BOOTANIMATIONDIR=$CONFIGDIR/custom/开机动画
+SHUTANIMATIONDIR=$CONFIGDIR/custom/关机动画
 PATCHDIR="$CONFIGDIR/patch"
 PROFILE=$SRCDIR/mediatek/config/$PROJECT/elink/$1
 CUSTOMCONF=$SRCDIR/mediatek/config/common/custom.conf
 DEFAULTXML=$SRCDIR/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
 CONFILE="$CONFIGDIR/config.ini"
-BLUETOOTHNAME=`awk -F"= " '{if(/^蓝牙名称/)print $2}' $CONFILE`
-WLANSSID=`awk -F"= " '{if(/^共享SSID名称/)print $2}' $CONFILE`
-MODELNAME=`awk -F"= " '{if(/^机型名称/)print $2}' $CONFILE`
-BUILDVERSION=`awk -F"= " '{if(/^编译版本/)print $2}' $CONFILE`
-CUSTOMBUILDVERSION=`awk -F"= " '{if(/^自定义编译版本/)print $2}' $CONFILE`
-TIMEZONE=`awk -F"= " 'gsub(/\//,"\\\/"){if(/^时区/)print $2}' $CONFILE`
-BRIGHTNESS=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^默认亮度/)print $2}' $CONFILE`
-SCREENTIMEOUT=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^屏幕延时/)print $2}' $CONFILE`
-UNKNOWSRC=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^未知来源/)print $2}' $CONFILE`
-INPUTMETHOD=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^默认输入法/)print $2}' $CONFILE`
-DISKLABEL=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}' $CONFILE`
-ONLINELABEL=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
-HOMEPAGE=`awk -F"= " 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
-ACTIVEPROFILE=`awk -F"= " 'sub(/^[[:blank:]]*/,"",$2){if(/^情景模式/)print $2}' $CONFILE`
-echo $ACTIVEPROFILE
+BLUETOOTHNAME=`awk -F"=" '{if(/^蓝牙名称/)print $2}' $CONFILE`
+WLANSSID=`awk -F"=" '{if(/^共享SSID名称/)print $2}' $CONFILE`
+MODELNAME=`awk -F"=" '{if(/^机型名称/)print $2}' $CONFILE`
+BUILDVERSION=`awk -F"=" '{if(/^编译版本/)print $2}' $CONFILE`
+CUSTOMBUILDVERSION=`awk -F"=" '{if(/^自定义编译版本/)print $2}' $CONFILE`
+TIMEZONE=`awk -F"=" 'gsub(/\//,"\\\/"){if(/^时区/)print $2}' $CONFILE`
+BRIGHTNESS=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认亮度/)print $2}' $CONFILE`
+SCREENTIMEOUT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^屏幕延时/)print $2}' $CONFILE`
+UNKNOWSRC=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^未知来源/)print $2}' $CONFILE`
+INPUTMETHOD=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认输入法/)print $2}' $CONFILE`
+DISKLABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}' $CONFILE`
+ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
+HOMEPAGE=`awk -F"=" 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
+ACTIVEPROFILE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^情景模式/)print $2}' $CONFILE`
+BOOTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^开机动画/)print $2}' $CONFILE`
+BOOTFPS=`echo $BOOTANIMATION | awk '{print $1}'`
+BOOTTIMES=`echo $BOOTANIMATION | awk '{print $2}'`
+SHUTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^关机动画/)print $2}' $CONFILE`
+SHUTFPS=`echo $SHUTANIMATION | awk '{print $1}'`
+SHUTTIMES=`echo $SHUTANIMATION | awk '{print $2}'`
+
 #修改蓝牙名称
 if [ ! -z "$BLUETOOTHNAME" ];then
 	echo ">>>>>Configurate Bluetooth Name = $BLUETOOTHNAME "
@@ -130,5 +137,67 @@ if [ ! -z "$ACTIVEPROFILE" ];then
 	fi
 	echo ">>>>>Modify line_label = $ACTIVEPROFILE"
 	sed -i "/\"def_active_profile\"/s/>.*</>$RESULT</" $SRCDIR/frameworks/base/packages/SettingsProvider/res/values/mtk_defaults.xml
+fi
 
+#修改开机动画
+makeanimation()
+{
+	if [ $1 = "boot" ];then
+		echo ">>>>>begin to make bootanimation"
+		cd $BOOTANIMATIONDIR
+		RESULT=bootanimation
+	elif [ $1 = "shut" ];then
+		echo ">>>>>begin to make shutanimation"
+		cd $SHUTANIMATIONDIR
+		RESULT=shutanimation
+	fi
+	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" `
+	if [ -z "$FILES" ];then
+		echo "no animation source picture!!!"
+		exit 1
+	fi
+	
+	mkdir -p $RESULT/part0
+	mkdir -p $RESULT/part1
+	FILEINFO=`file ${FILES}`
+	LASTONE=`echo $FILES| awk '{print $NF}'`
+	NF=`echo $FILES| awk '{print NF}'`
+	INDEX=0
+	EXTENSION=${LASTONE##*.}
+	WIDTH=`identify $LASTONE | awk '{print $3}' | awk -F"x" '{print $1}'`
+	HEIGHT=`identify $LASTONE | awk '{print $3}' | awk -F"x" '{print $2}'`
+	cp $LASTONE $RESULT/part1/`printf "%04d\n" $NF`.$EXTENSION
+	
+	for i in ${FILES}
+	do 
+		INDEX=`expr $INDEX + 1` 
+		NAME=`printf "%04d\n" ${INDEX}`
+		mv $i $RESULT/part0/${NAME}.$EXTENSION
+	done
+	
+	cd $RESULT
+
+	if [ $1 = "boot" ];then
+		echo "$WIDTH $HEIGHT $BOOTFPS" > desc.txt
+		echo "p $BOOTTIMES 0 part0" >> desc.txt
+		echo "p 0 0 part1" >> desc.txt
+	elif [ $1 = "shut" ];then
+		echo "$WIDTH $HEIGHT $SHUTFPS" > desc.txt
+		echo "p $SHUTTIMES 0 part0" >> desc.txt
+		echo "p 0 0 part1" >> desc.txt
+	fi
+	zip ./$RESULT ./* ./desc.txt -r -0
+	cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
+	rm ../* -r
+	cd $CONFIGDIR
+}
+
+if [ ! -z "$BOOTANIMATION" ];then
+	makeanimation boot;
+	echo "make $RESULT successfully ===========> OK"
+fi
+
+if [ ! -z "$SHUTANIMATION" ];then
+	makeanimation shut;
+	echo "make $RESULT successfully ===========> OK"
 fi
