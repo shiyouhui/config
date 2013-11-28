@@ -271,14 +271,31 @@ makelogo()
 		cd $KERNELLOGODIR
 	fi
 
+	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr "" "\?" `
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
+	if [ -z "$FILES" ];then
+		echo "no logo source picture!!!"
+		return
+	fi
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr -d ' '`
+			mv "$f" "$TARGET"
+		   echo mv 	"$f" "$TARGET"
+		done
+	fi
+
 	if [ $PROJECT = "md706" ];then
 		if [ $DENSITY = "L" ];then
 			convert * cu_wvga_$1.bmp
-			cp -p *.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_wvga/
+			cp -p cu_wvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_wvga/
 			rm *
 		elif [ $DENSITY = "H" ];then  
 			convert * wsvga_$1.bmp
-			cp -p *.bmp $SRCDIR/mediatek/custom/common/lk/logo/wsvga/
+			cp -p wsvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wsvga/
 			rm *
 		fi
 	elif [ $PROJECT = "md790" ];then
@@ -299,4 +316,32 @@ if [ ! -z "$KERNELLOGO" ];then
 fi
 
 #修改默认壁纸
+WALLPAPER=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认桌面壁纸/)print $2}' $CONFILE`
+WALLPAPERDIR=$CONFIGDIR/custom/默认桌面壁纸
+if [ ! -z "$WALLPAPER" ];then
+	echo ">>>>>Change default wallpaper!!"
+	cd $WALLPAPERDIR
+
+	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr "" "\?" `
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
+	if [ -z "$FILES" ];then
+		echo "no default wallpaper source picture!!!"
+		return
+	fi
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr -d ' '`
+			mv "$f" "$TARGET"
+		   echo mv 	"$f" "$TARGET"
+		done
+	fi
+	convert * default_wallpaper.jpg 
+	cp -p  default_wallpaper.jpg $SRCDIR/frameworks/base/core/res/res/drawable-nodpi/
+	rm * -r
+	echo "Change default  wallpaper  successfully ===========> OK"
+	cd $SRCDIR
+fi
 
