@@ -10,103 +10,84 @@ CONFIGDIR=$PWD
 cd ../alps
 SRCDIR=$PWD
 cd ->>null
-BOOTANIMATIONDIR=$CONFIGDIR/custom/开机动画
-SHUTANIMATIONDIR=$CONFIGDIR/custom/关机动画
-UBOOTLOGODIR=$CONFIGDIR/custom/第一屏
-KERNELLOGODIR=$CONFIGDIR/custom/第二屏
 PATCHDIR="$CONFIGDIR/patch"
 PROFILE=$SRCDIR/mediatek/config/$PROJECT/elink/$1
 CUSTOMCONF=$SRCDIR/mediatek/config/common/custom.conf
 DEFAULTXML=$SRCDIR/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
 CONFILE="$CONFIGDIR/config.ini"
-BLUETOOTHNAME=`awk -F"=" '{if(/^蓝牙名称/)print $2}' $CONFILE`
-WLANSSID=`awk -F"=" '{if(/^共享SSID名称/)print $2}' $CONFILE`
-MODELNAME=`awk -F"=" '{if(/^机型名称/)print $2}' $CONFILE`
-BUILDVERSION=`awk -F"=" '{if(/^编译版本/)print $2}' $CONFILE`
-CUSTOMBUILDVERSION=`awk -F"=" '{if(/^自定义编译版本/)print $2}' $CONFILE`
-TIMEZONE=`awk -F"=" 'gsub(/\//,"\\\/"){if(/^时区/)print $2}' $CONFILE`
-BRIGHTNESS=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认亮度/)print $2}' $CONFILE`
-SCREENTIMEOUT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^屏幕延时/)print $2}' $CONFILE`
-UNKNOWSRC=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^未知来源/)print $2}' $CONFILE`
-INPUTMETHOD=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认输入法/)print $2}' $CONFILE`
-DISKLABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}' $CONFILE`
-ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
-HOMEPAGE=`awk -F"=" 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
-ACTIVEPROFILE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^情景模式/)print $2}' $CONFILE`
-SUBCAMERA=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^前摄像头插值/)print $2}' $CONFILE`
-MAINCAMERA=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^后摄像头插值/)print $2}' $CONFILE`
-BOOTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^开机动画/)print $2}' $CONFILE`
-BOOTFPS=`echo $BOOTANIMATION | awk '{print $1}'`
-BOOTTIMES=`echo $BOOTANIMATION | awk '{print $2}'`
-SHUTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^关机动画/)print $2}' $CONFILE`
-SHUTFPS=`echo $SHUTANIMATION | awk '{print $1}'`
-SHUTTIMES=`echo $SHUTANIMATION | awk '{print $2}'`
-UBOOTLOGO=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^第一屏/)print $2}' $CONFILE`
-KERNELLOGO=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^第二屏/)print $2}' $CONFILE`
-
-
 
 #修改蓝牙名称
+BLUETOOTHNAME=`awk -F"=" '{if(/^蓝牙名称/)print $2}' $CONFILE`
 if [ ! -z "$BLUETOOTHNAME" ];then
 	echo ">>>>>Configurate Bluetooth Name = $BLUETOOTHNAME "
 	sed -i "/^bluetooth/s/=.*/=$BLUETOOTHNAME/" $CUSTOMCONF
 fi
 
 #修改Wifi共享热点SSID
+WLANSSID=`awk -F"=" '{if(/^共享SSID名称/)print $2}' $CONFILE`
 if [ ! -z "$WLANSSID" ];then
 	echo ">>>>>Configurate WLAN_SSID Display Label = $WLANSSID"
 	sed -i "/^wlan.SSID/s/=.*/=$WLANSSID/" $CUSTOMCONF
 fi
 
 #修改机型名
+MODELNAME=`awk -F"=" '{if(/^机型名称/)print $2}' $CONFILE`
 if [ ! -z "$MODELNAME" ];then
 	echo ">>>>>Configurate Model Name = $MODELNAME"
 	sed -i "/^PRODUCT_MODEL/s/=.*/=$MODELNAME/" $PROFILE/elink_ID.mk
 fi
 
 #修改编译版本
+BUILDVERSION=`awk -F"=" '{if(/^编译版本/)print $2}' $CONFILE`
 if [ ! -z "$BUILDVERSION" ];then
 	echo ">>>>>Configurate Build version = $BUILDVERSION"
 	sed -i "/^ELINK_VERSION/s/=.*/=$BUILDVERSION/" $PROFILE/elink_ID.mk
 fi
 
 #修改自定义编译版本
+CUSTOMBUILDVERSION=`awk -F"=" '{if(/^自定义编译版本/)print $2}' $CONFILE`
 if [ ! -z "$CUSTOMBUILDVERSION" ];then
 	echo ">>>>>Configurate Customer build version = $CUSTOMBUILDVERSION"
 	sed -i "/^CUSTOM_BUILD_VERNO/s/=.*/=$CUSTOMBUILDVERSION/" $SRCDIR/mediatek/config/common/ProjectConfig.mk
 fi
 
 #修改时区
+TIMEZONE=`awk -F"=" 'gsub(/\//,"\\\/"){if(/^时区/)print $2}' $CONFILE`
 if [ ! -z "$TIMEZONE" ];then
 	echo ">>>>>Configurate Timezone = $TIMEZONE"
 	sed -i "/^persist.sys.timezone/s/=.*/=$TIMEZONE/" $PROFILE/system.prop
 fi
 
 #修改默认亮度
+BRIGHTNESS=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认亮度/)print $2}' $CONFILE`
 if [ ! -z "$BRIGHTNESS" ];then
 	echo ">>>>>Configurate Screen brightness = $BRIGHTNESS"
 	sed -i "/\"def_screen_brightness\"/s/>.*</>$BRIGHTNESS</" $DEFAULTXML
 fi
 
 #修改屏幕延时
+SCREENTIMEOUT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^屏幕延时/)print $2}' $CONFILE`
 if [ ! -z "$SCREENTIMEOUT" ];then
 	echo ">>>>>Configurate screen timeout = $SCREENTIMEOUT"
 	sed -i "/\"def_screen_off_timeout\"/s/>.*</>$SCREENTIMEOUT</" $DEFAULTXML
 fi
 
 #修改未知来源默认
+UNKNOWSRC=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^未知来源/)print $2}' $CONFILE`
 if [ ! -z "$UNKNOWSRC" ];then
 	echo ">>>>>Unkownsource selected = $UNKNOWSRC"
 	sed -i "/\"def_install_non_market_apps\"/s/>.*</>$UNKNOWSRC</" $DEFAULTXML
 fi
 
 #修改默认输入法
+INPUTMETHOD=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认输入法/)print $2}' $CONFILE`
 if [ ! -z "$INPUTMETHOD" ];then
 	echo ">>>>>Modify default input_method = $INPUTMETHOD"
 	sed -i "/^DEFAULT_INPUT_METHOD/s/=.*/=$INPUTMETHOD/" $PROFILE/ProjectConfig.mk
 fi
 
 #修改可移动磁盘名
+DISKLABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}' $CONFILE`
 if [ ! -z "$DISKLABEL" ];then
 	echo ">>>>>Modify disk = $DISKLABEL"
 	cd $SRCDIR/system/core
@@ -118,6 +99,7 @@ if [ ! -z "$DISKLABEL" ];then
 fi
 
 #修改联机ID
+ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
 if [ ! -z "$ONLINELABEL" ];then
 	echo ">>>>>Modify line_label = $ONLINELABEL"
 	sed -i "s/File-Stor Gadget/$ONLINELABEL/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
@@ -125,12 +107,14 @@ if [ ! -z "$ONLINELABEL" ];then
 fi
 
 #修改浏览器主页
+HOMEPAGE=`awk -F"=" 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
 if [ ! -z "$HOMEPAGE" ];then
 	echo ">>>>>Modify default Browse Homepage = `expr substr $HOMEPAGE 10 20`"
 	sed -i "s/getFactoryResetHomeUrl(mContext)/\"$HOMEPAGE\"/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
 fi
 
 #修改前摄像头插值
+SUBCAMERA=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^前摄像头插值/)print $2}' $CONFILE`
 if  [ ! -z "$SUBCAMERA" ];then
 	if [ "$SUBCAMERA" = "30" ];then
 		SUBSIZE=CAPTURE_SIZE_640_480
@@ -149,6 +133,7 @@ if  [ ! -z "$SUBCAMERA" ];then
 fi
 
 #修改后摄像头插值
+MAINCAMERA=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^后摄像头插值/)print $2}' $CONFILE`
 if  [ ! -z "$MAINCAMERA" ];then
 	if [ "$MAINCAMERA" = "30" ];then
 		MAINSIZE=CAPTURE_SIZE_640_480
@@ -172,6 +157,7 @@ if  [ ! -z "$MAINCAMERA" ];then
 fi
 
 #修改默认情景模式
+ACTIVEPROFILE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^情景模式/)print $2}' $CONFILE`
 if [ ! -z "$ACTIVEPROFILE" ];then
 	if [ "$ACTIVEPROFILE" = "标准" ];then
 		RESULT=mtk_audioprofile_general
@@ -189,6 +175,14 @@ if [ ! -z "$ACTIVEPROFILE" ];then
 fi
 
 #制作动画
+BOOTANIMATIONDIR=$CONFIGDIR/custom/开机动画
+SHUTANIMATIONDIR=$CONFIGDIR/custom/关机动画
+BOOTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^开机动画/)print $2}' $CONFILE`
+BOOTFPS=`echo $BOOTANIMATION | awk '{print $1}'`
+BOOTTIMES=`echo $BOOTANIMATION | awk '{print $2}'`
+SHUTANIMATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^关机动画/)print $2}' $CONFILE`
+SHUTFPS=`echo $SHUTANIMATION | awk '{print $1}'`
+SHUTTIMES=`echo $SHUTANIMATION | awk '{print $2}'`
 makeanimation()
 {
 	if [ $1 = "boot" ];then
@@ -262,7 +256,11 @@ if [ ! -z "$SHUTANIMATION" ];then
 	makeanimation shut;
 fi
 
-#开机logo
+#制作开机logo
+UBOOTLOGODIR=$CONFIGDIR/custom/第一屏
+KERNELLOGODIR=$CONFIGDIR/custom/第二屏
+UBOOTLOGO=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^第一屏/)print $2}' $CONFILE`
+KERNELLOGO=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^第二屏/)print $2}' $CONFILE`
 makelogo()
 {
 	if [ $1 = "uboot" ];then
@@ -299,4 +297,6 @@ fi
 if [ ! -z "$KERNELLOGO" ];then
 	makelogo kernel
 fi
+
+#修改默认壁纸
 
