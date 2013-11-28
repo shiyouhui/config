@@ -200,17 +200,27 @@ makeanimation()
 		cd $SHUTANIMATIONDIR
 		RESULT=shutanimation
 	fi
-	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" `
+	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr "" "\?" `
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
 		echo "no animation source picture!!!"
-		exit 1
+		return
 	fi
-	
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr -d ' '`
+			mv "$f" "$TARGET"
+		   echo mv 	"$f" "$TARGET"
+		done
+	fi
+	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation"`
+
 	mkdir -p $RESULT/part0
 	mkdir -p $RESULT/part1
-	FILEINFO=`file ${FILES}`
 	LASTONE=`echo $FILES| awk '{print $NF}'`
-	NF=`echo $FILES| awk '{print NF}'`
 	INDEX=0
 	EXTENSION=${LASTONE##*.}
 	WIDTH=`identify $LASTONE | awk '{print $3}' | awk -F"x" '{print $1}'`
@@ -278,11 +288,7 @@ makelogo()
 	fi
 	echo "make $1 logo  successfully ===========> OK"
 	cd $CONFIGDIR
-
-
 }
-
-
 
 #开机第一屏logo
 if [ ! -z "$UBOOTLOGO" ];then
