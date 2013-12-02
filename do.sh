@@ -454,3 +454,12 @@ if [ ! -z "$EXTRAWALLPAPER" ];then
 	cd $CONFIGDIR
 
 fi
+
+#默认语言
+LANGUAGE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认语言/)print $2}' $CONFILE`
+if [ ! -z "$LANGUAGE" ];then
+	echo ">>>>>default Language = $LANGUAGE"
+	sed -i "/DEFAULT_LATIN_IME_LANGUAGES/s/=.*/=$LANGUAGE/" $PROFILE/ProjectConfig.mk
+	sed -i "/MTK_PRODUCT_LOCALES/s/$LANGUAGE//" $PROFILE/ProjectConfig.mk
+	sed -i "/MTK_PRODUCT_LOCALES/s/=/=$LANGUAGE /" $PROFILE/ProjectConfig.mk
+fi
