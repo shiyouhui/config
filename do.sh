@@ -347,3 +347,67 @@ if [ ! -z "$WALLPAPER" ];then
 	cd $SRCDIR
 fi
 
+#预置APK
+APKHANDLE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^预置APK/)print $2}' $CONFILE`
+APKDIR=$CONFIGDIR/custom/预置APK
+if [ ! -z "$APKHANDLE" ];then
+	echo ">>>>>begin copy customer apk to android soruce!!"
+	cd $APKDIR
+
+	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr " " "\?" `
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
+	if [ -z "$FILES" ];then
+		echo "NO apk file!!!"
+		return
+	fi
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr -d ' '`
+			mv "$f" "$TARGET"
+		   echo mv 	"$f" "$TARGET"
+		done
+	fi
+
+	if [ "$APKHANDLE" -eq "1" ];then
+		for i in `ls`
+		do
+			echo "copy $i to app"
+			cp -p $i $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/
+			echo "copy $i to appbackup"
+			cp -p $i $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/appbackup/
+			echo "/data/app/$i" >> $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/.keep_list
+			echo "/system/appbackup/$i" >> $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/app/.restore_list
+		done
+		rm * -r
+		cd $CONFIGDIR
+	elif [ "$APKHANDLE" -eq "2" ];then
+		for i in `ls`
+		do
+			echo "copy $i to system_app"
+			APKNAME=`echo $i | awk -F"." '{print $1}'`
+			mkdir -p  $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME
+			cp -p $i $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
+			cp -p $PATCHDIR/Android.mk $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
+			sed -i "/LOCAL_MODULE :=/s/:=.*/:= $APKNAME/" $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/Android.mk
+			echo "       $APKNAME \\" >> $SRCDIR/vendor/common/SYSTEM_APP/products/APPS.mk
+		done
+		rm * -r
+		cd $CONFIGDIR
+	elif [ "$APKHANDLE" -eq "3" ];then
+		echo "copy $i to app"
+		for i in `ls`
+		do
+			echo "copy $i to app"
+			cp -p $i $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/
+		done
+		rm * -r
+		cd $CONFIGDIR
+	else
+		echo "ERROE:error apk handle!!!!"
+		return
+	fi
+
+fi
