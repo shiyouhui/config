@@ -1,0 +1,13 @@
+diff --git a/src/com/android/browser/BrowserSettings.java b/src/com/android/browser/BrowserSettings.java
+index af9448d..2057934 100755
+--- a/src/com/android/browser/BrowserSettings.java
++++ b/src/com/android/browser/BrowserSettings.java
+@@ -821,7 +821,7 @@ public class BrowserSettings implements OnSharedPreferenceChangeListener,
+     // -----------------------------
+ 
+     public String getHomePage() {
+-        return mPrefs.getString(PREF_HOMEPAGE, getFactoryResetHomeUrl(mContext));
++        return mPrefs.getString(PREF_HOMEPAGE, getFactoryResetHomeUrl(mContext)); //default homepage
+     }
+ 
+     public void setHomePage(String value) {

@@ -112,7 +112,9 @@ fi
 HOMEPAGE=`awk -F"=" 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
 if [ ! -z "$HOMEPAGE" ];then
 	echo ">>>>>Modify default Browse Homepage = `expr substr $HOMEPAGE 10 20`"
-	sed -i "s/getFactoryResetHomeUrl(mContext)/\"$HOMEPAGE\"/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
+	cd $SRCDIR/packages/apps/Browser
+	git apply --ignore-whitespace $PATCHDIR/homepage.path
+	sed -i "/default homepage/s/,.*);/,\"$HOMEPAGE\");/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
 fi
 
 #修改前摄像头插值
