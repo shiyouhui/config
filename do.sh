@@ -211,7 +211,7 @@ makeanimation()
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			mv "$f" "$TARGET"
-		   echo mv 	"$f" "$TARGET"
+			echo mv 	"$f" "$TARGET"
 		done
 	fi
 	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation"`
@@ -227,27 +227,27 @@ makeanimation()
 	
 	for i in ${FILES}
 	do 
-		INDEX=`expr $INDEX + 1` 
-		NAME=`printf "%04d\n" ${INDEX}`
-		mv $i $RESULT/part0/${NAME}.$EXTENSION
-	done
-	
-	cd $RESULT
+	INDEX=`expr $INDEX + 1` 
+	NAME=`printf "%04d\n" ${INDEX}`
+	mv $i $RESULT/part0/${NAME}.$EXTENSION
+done
 
-	if [ $1 = "boot" ];then
-		echo "$WIDTH $HEIGHT $BOOTFPS" > desc.txt
-		echo "p $BOOTTIMES 0 part0" >> desc.txt
-		echo "p 0 0 part1" >> desc.txt
-	elif [ $1 = "shut" ];then
-		echo "$WIDTH $HEIGHT $SHUTFPS" > desc.txt
-		echo "p $SHUTTIMES 0 part0" >> desc.txt
-		echo "p 0 0 part1" >> desc.txt
-	fi
-	zip ./$RESULT ./* ./desc.txt -r -0
-	cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
-	rm ../* -r
-	echo "make $RESULT successfully ===========> OK"
-	cd $CONFIGDIR
+cd $RESULT
+
+if [ $1 = "boot" ];then
+	echo "$WIDTH $HEIGHT $BOOTFPS" > desc.txt
+	echo "p $BOOTTIMES 0 part0" >> desc.txt
+	echo "p 0 0 part1" >> desc.txt
+elif [ $1 = "shut" ];then
+	echo "$WIDTH $HEIGHT $SHUTFPS" > desc.txt
+	echo "p $SHUTTIMES 0 part0" >> desc.txt
+	echo "p 0 0 part1" >> desc.txt
+fi
+zip ./$RESULT ./* ./desc.txt -r -0
+cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
+rm ../* -r
+echo "make $RESULT successfully ===========> OK"
+cd $CONFIGDIR
 }
 
 #开机动画
@@ -288,7 +288,7 @@ makelogo()
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			mv "$f" "$TARGET"
-		   echo mv 	"$f" "$TARGET"
+			echo mv 	"$f" "$TARGET"
 		done
 	fi
 
@@ -339,7 +339,7 @@ if [ ! -z "$WALLPAPER" ];then
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			mv "$f" "$TARGET"
-		   echo mv 	"$f" "$TARGET"
+			echo mv 	"$f" "$TARGET"
 		done
 	fi
 	convert * default_wallpaper.jpg 
@@ -369,7 +369,7 @@ if [ ! -z "$APKHANDLE" ];then
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			mv "$f" "$TARGET"
-		   echo mv 	"$f" "$TARGET"
+			echo mv 	"$f" "$TARGET"
 		done
 	fi
 
@@ -411,5 +411,46 @@ if [ ! -z "$APKHANDLE" ];then
 		echo "ERROE:error apk handle!!!!"
 		return
 	fi
+
+fi
+
+#添加壁纸
+EXTRAWALLPAPER=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^备选壁纸/)print $2}' $CONFILE`
+EXTRAWALLPAPERDIR=$CONFIGDIR/custom/备选壁纸
+if [ ! -z "$EXTRAWALLPAPER" ];then
+	echo ">>>>>begin copy extra wallpaper!!"
+	cd $EXTRAWALLPAPERDIR
+	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr "" "\?" `
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
+	if [ -z "$FILES" ];then
+		echo "no extra wallpaper picture!!!"
+		return
+	fi
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr -d ' '`
+			mv "$f" "$TARGET"
+			echo mv 	"$f" "$TARGET"
+		done
+	fi
+
+	INDEX=1
+	LASTONE=`echo $FILES| awk '{print $NF}'`
+	EXTENSION=${LASTONE##*.}
+	for f in `ls ./ | tr " " "\?"`
+	do
+		mv "$f" wallpaper_extra_$INDEX.$EXTENSION
+		echo mv "$f" wallpaper_extra_$INDEX.$EXTENSION
+		convert -resize 213x189 wallpaper_extra_"$INDEX"."$EXTENSION" wallpaper_extra_"$INDEX"_small.$EXTENSION
+		cp  wallpaper_extra_"$INDEX"."$EXTENSION" $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
+		cp  wallpaper_extra_"$INDEX"_small.$EXTENSION $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
+		sed -i "/wallpapers/s/$/\n<item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values/wallpapers.xml
+		INDEX=`expr $INDEX + 1` 
+	done
+	rm * -r
+	cd $CONFIGDIR
 
 fi
