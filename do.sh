@@ -1,6 +1,6 @@
 #!/bin/sh
 if [ $# != 1 ];then
-	echo "fatal: usage( ./configurate MD7062HC2W1 )"
+	echo "fatal: usage( ./do.sh MD7062HC2W1 )"
 	exit 1
 fi
 PROJECT=`expr substr $1 1 5 |tr '[A-Z]' '[a-z]'`
