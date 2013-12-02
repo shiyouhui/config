@@ -463,3 +463,12 @@ if [ ! -z "$LANGUAGE" ];then
 	sed -i "/MTK_PRODUCT_LOCALES/s/$LANGUAGE//" $PROFILE/ProjectConfig.mk
 	sed -i "/MTK_PRODUCT_LOCALES/s/=/=$LANGUAGE /" $PROFILE/ProjectConfig.mk
 fi
+
+echo "Begin to build your project?(y/n)"
+read CMD
+if[ $CMD = "y" ];then
+	cd $SRCDIR
+	./make_user_project.sh $PROJECT $1 new
+else
+	exit 1
+fi
