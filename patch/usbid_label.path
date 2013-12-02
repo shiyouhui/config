@@ -1,0 +1,15 @@
+diff --git a/drivers/usb/gadget/f_mass_storage.c b/drivers/usb/gadget/f_mass_storage.c
+index a65f5d4..b3fe140 100755
+--- a/drivers/usb/gadget/f_mass_storage.c
++++ b/drivers/usb/gadget/f_mass_storage.c
+@@ -2903,8 +2903,8 @@ buffhds_first_it:
+ 		 "%-8s%-16s%04x", cfg->vendor_name ?: "Linux",
+ 		 /* Assume product name dependent on the first LUN */
+ 		 cfg->product_name ?: (common->luns->cdrom
+-				     ? "File-Stor Gadget"
+-				     : "File-CD Gadget"),
++				     ? "File-Stor Gadget" //id display label1
++				     : "File-CD Gadget"), //id display label2
+ 		 i);
+ 
+ 	/*

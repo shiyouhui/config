@@ -94,7 +94,7 @@ if [ ! -z "$DISKLABEL" ];then
 	git apply --ignore-whitespace $PATCHDIR/lowcase.patch  
 	cd ../vold
 	git  apply --ignore-whitespace $PATCHDIR/parttion_label.patch 
-	sed -i "s/MID-700/$DISKLABEL/" ./Fat.cpp 
+	sed -i "/display label/s/\".*\"/\"$DISKLABEL\"/" ./Fat.cpp 
 	cd $CONFIGDIR
 fi
 
@@ -102,8 +102,10 @@ fi
 ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
 if [ ! -z "$ONLINELABEL" ];then
 	echo ">>>>>Modify line_label = $ONLINELABEL"
-	sed -i "s/File-Stor Gadget/$ONLINELABEL/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
-	sed -i "s/File-CD Gadget/$ONLINELABEL/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
+	cd $SRCDIR/kernel/drivers
+	git apply --ignore-whitespace $PATCHDIR/usbid_label.path
+	sed -i "/id display label1/s/\".*\"/\"$ONLINELABEL\"/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
+	sed -i "/id display label2/s/\".*\"/\"$ONLINELABEL\"/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
 fi
 
 #修改浏览器主页

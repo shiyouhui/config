@@ -68,7 +68,7 @@ index dfbfd7a..4374990 100755
 +/***modify by xiangxiang***/
 +	if (isInternalSd){
 +	args[7] = "-L";
-+	args[8] = "MID-700";       // modify your label here
++	args[8] = "MID-700";       // display label
 +	args[9] = fsPath;
 +   args[10] = NULL;
 +   rc = logwrap(11, args, 1);
