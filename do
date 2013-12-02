@@ -352,6 +352,9 @@ fi
 #预置APK
 APKHANDLE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^预置APK/)print $2}' $CONFILE`
 APKDIR=$CONFIGDIR/custom/预置APK
+DATAAPPDIR=$SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app
+SYSTEMAPPDIR=$SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/app
+BACKUPDIR=$SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/appbackup
 if [ ! -z "$APKHANDLE" ];then
 	echo ">>>>>begin copy customer apk to android soruce!!"
 	cd $APKDIR
@@ -373,15 +376,25 @@ if [ ! -z "$APKHANDLE" ];then
 		done
 	fi
 
+	if [! -d $DATAAPPDIR ];then
+		mkdir -p $DATAAPPDIR
+	fi
+	if [! -d $SYSTEMAPPDIR ];then
+		mkdir -p $SYSTEMAPPDIR
+	fi
+	if [! -d $BACKUPDIR ];then
+		mkdir -p $BACKUPDIR
+	fi
+
 	if [ "$APKHANDLE" -eq "1" ];then
 		for i in `ls`
 		do
 			echo "copy $i to app"
-			cp -p $i $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/
+			cp -p $i $DATAAPPDIR
 			echo "copy $i to appbackup"
-			cp -p $i $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/appbackup/
-			echo "/data/app/$i" >> $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/.keep_list
-			echo "/system/appbackup/$i" >> $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/app/.restore_list
+			cp -p $i $BACKUPDIR
+			echo "/data/app/$i" >> $DATAAPPDIR/.keep_list
+			echo "/system/appbackup/$i" >> $SYSTEMAPPDIR/.restore_list
 		done
 		rm * -r
 		cd $CONFIGDIR
