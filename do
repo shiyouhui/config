@@ -386,6 +386,8 @@ if [ ! -z "$APKHANDLE" ];then
 		mkdir -p $BACKUPDIR
 	fi
 
+
+
 	if [ "$APKHANDLE" -eq "1" ];then
 		for i in `ls`
 		do
@@ -480,7 +482,7 @@ fi
 
 echo "Begin to build your project?(y/n)"
 read CMD
-if[ $CMD = "y" ];then
+if [ $CMD = "y" ];then
 	cd $SRCDIR
 	./make_user_project.sh $PROJECT $1 new
 else
