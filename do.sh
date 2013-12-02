@@ -404,6 +404,7 @@ if [ ! -z "$APKHANDLE" ];then
 		do
 			echo "copy $i to app"
 			cp -p $i $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/
+			echo "/data/app/$i" >> $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/.keep_list
 		done
 		rm * -r
 		cd $CONFIGDIR
