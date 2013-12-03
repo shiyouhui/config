@@ -383,13 +383,13 @@ if [ ! -z "$APKHANDLE" ];then
 		done
 	fi
 
-	if [! -d $DATAAPPDIR ];then
+	if [ ! -d $DATAAPPDIR ];then
 		mkdir -p $DATAAPPDIR
 	fi
-	if [! -d $SYSTEMAPPDIR ];then
+	if [ ! -d $SYSTEMAPPDIR ];then
 		mkdir -p $SYSTEMAPPDIR
 	fi
-	if [! -d $BACKUPDIR ];then
+	if [ ! -d $BACKUPDIR ];then
 		mkdir -p $BACKUPDIR
 	fi
 
