@@ -216,32 +216,39 @@ makeanimation()
 	fi
 	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation"`
 
-	mkdir -p $RESULT/part0
-	mkdir -p $RESULT/part1
 	LASTONE=`echo $FILES| awk '{print $NF}'`
 	INDEX=0
 	EXTENSION=${LASTONE##*.}
 	WIDTH=`identify $LASTONE | awk '{print $3}' | awk -F"x" '{print $1}'`
 	HEIGHT=`identify $LASTONE | awk '{print $3}' | awk -F"x" '{print $2}'`
-	cp $LASTONE $RESULT/part1/`printf "%04d\n" $NF`.$EXTENSION
-	
+
 	for i in ${FILES}
 	do 
-	INDEX=`expr $INDEX + 1` 
-	NAME=`printf "%04d\n" ${INDEX}`
-	mv $i $RESULT/part0/${NAME}.$EXTENSION
-done
+		INDEX=`expr $INDEX + 1` 
+		j=`echo "( $INDEX - 1 )%20" |bc`
+		k=`echo "( $INDEX - 1 )/20" |bc`
+		if [ $j -eq 0 ];then
+			mkdir -p $RESULT/part$k
+		fi
+		NAME=`printf "%04d\n" ${INDEX}`
+		echo "mv $i $RESULT/part$k/${NAME}.$EXTENSION"
+		mv $i $RESULT/part$k/${NAME}.$EXTENSION
+	done
 
-cd $RESULT
+	cd $RESULT
 
 if [ $1 = "boot" ];then
 	echo "$WIDTH $HEIGHT $BOOTFPS" > desc.txt
-	echo "p $BOOTTIMES 0 part0" >> desc.txt
-	echo "p 0 0 part1" >> desc.txt
+	for i in `ls -l | grep "^d" | awk '{print $8}'`
+	do
+		echo "p $BOOTTIMES 0 $i" >> desc.txt
+	done
 elif [ $1 = "shut" ];then
 	echo "$WIDTH $HEIGHT $SHUTFPS" > desc.txt
-	echo "p $SHUTTIMES 0 part0" >> desc.txt
-	echo "p 0 0 part1" >> desc.txt
+	for i in `ls -l | grep "^-"`
+	do
+		echo "p $SHUTTIMES 0 $i" >> desc.txt
+	done
 fi
 zip ./$RESULT ./* ./desc.txt -r -0
 cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
