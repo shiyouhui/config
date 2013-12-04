@@ -233,7 +233,7 @@ makeanimation()
 		NAME=`printf "%04d\n" ${INDEX}`
 		echo "mv $i $RESULT/part$k/${NAME}.$EXTENSION"
 		mv $i $RESULT/part$k/${NAME}.$EXTENSION
-		if [ "$EXTENSION" != "png" ];then
+		if [ "$EXTENSION" != "png" || "$EXTENSION" != "png" ];then
 			convert $RESULT/part$k/${NAME}.$EXTENSION $RESULT/part$k/${NAME}.png
 			rm $RESULT/part$k/${NAME}.$EXTENSION
 		fi
@@ -412,7 +412,6 @@ if [ ! -z "$APKHANDLE" ];then
 		rm * -r
 		cd $CONFIGDIR
 	elif [ "$APKHANDLE" -eq "2" ];then
-		echo "  \\" >> $SRCDIR/vendor/common/SYSTEM_APP/products/APPS.mk
 		for i in `ls`
 		do
 			echo "copy $i to system_app"
@@ -421,7 +420,7 @@ if [ ! -z "$APKHANDLE" ];then
 			cp -p $i $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
 			cp -p $PATCHDIR/Android.mk $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
 			sed -i "/LOCAL_MODULE :=/s/:=.*/:= $APKNAME/" $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/Android.mk
-			echo "       $APKNAME \\" >> $SRCDIR/vendor/common/SYSTEM_APP/products/APPS.mk
+			sed -i '/ElinkEngineerMode/s/^/    '$APKNAME' \\ \n/' $SRCDIR/vendor/common/SYSTEM_APP/products/APPS.mk
 		done
 		rm * -r
 		cd $CONFIGDIR
