@@ -198,7 +198,7 @@ makeanimation()
 		cd $SHUTANIMATIONDIR
 		RESULT=shutanimation
 	fi
-	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr "" "\?" `
+	FILES=`ls | sort -n`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
@@ -216,7 +216,6 @@ makeanimation()
 					echo mv 	"$f" "$TARGET"
 				fi
 			fi
-			echo mv 	"$f" "$TARGET"
 		done
 	fi
 	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation"`
@@ -291,7 +290,7 @@ makelogo()
 		cd $KERNELLOGODIR
 	fi
 
-	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr "" "\?" `
+	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
@@ -307,7 +306,6 @@ makelogo()
 				mv "$f" "$TARGET"
 				echo mv 	"$f" "$TARGET"
 			fi
-			echo mv 	"$f" "$TARGET"
 		done
 	fi
 
@@ -345,7 +343,7 @@ if [ ! -z "$WALLPAPER" ];then
 	echo ">>>>>Change default wallpaper!!"
 	cd $WALLPAPERDIR
 
-	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr "" "\?" `
+	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
@@ -361,7 +359,6 @@ if [ ! -z "$WALLPAPER" ];then
 					mv "$f" "$TARGET"
 					echo mv 	"$f" "$TARGET"
 				fi
-			echo mv 	"$f" "$TARGET"
 		done
 	fi
 	convert * default_wallpaper.jpg 
@@ -381,7 +378,7 @@ if [ ! -z "$APKHANDLE" ];then
 	echo ">>>>>begin copy customer apk to android soruce!!"
 	cd $APKDIR
 
-	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr " " "\?" `
+	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
@@ -460,7 +457,7 @@ EXTRAWALLPAPERDIR=$CONFIGDIR/custom/备选壁纸
 if [ ! -z "$EXTRAWALLPAPER" ];then
 	echo ">>>>>begin copy extra wallpaper!!"
 	cd $EXTRAWALLPAPERDIR
-	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation" | tr "" "\?" `
+	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
@@ -476,7 +473,6 @@ if [ ! -z "$EXTRAWALLPAPER" ];then
 				mv "$f" "$TARGET"
 				echo mv "$f" "$TARGET"
 			fi
-			echo mv 	"$f" "$TARGET"
 		done
 	fi
 
@@ -490,7 +486,7 @@ if [ ! -z "$EXTRAWALLPAPER" ];then
 		convert -resize 213x189 wallpaper_extra_"$INDEX"."$EXTENSION" wallpaper_extra_"$INDEX"_small.$EXTENSION
 		cp  wallpaper_extra_"$INDEX"."$EXTENSION" $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
 		cp  wallpaper_extra_"$INDEX"_small.$EXTENSION $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
-		sed -i "/wallpapers/s/$/\n<item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values/wallpapers.xml
+		sed -i "/wallpapers/s/$/\n        <item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values/wallpapers.xml
 		INDEX=`expr $INDEX + 1` 
 	done
 	rm * -r
