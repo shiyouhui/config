@@ -9,7 +9,7 @@ DENSITY=`expr substr $1 7 1`
 CONFIGDIR=$PWD
 cd ../alps
 SRCDIR=$PWD
-cd ->>null
+cd ->>/dev/null
 PATCHDIR="$CONFIGDIR/patch"
 PROFILE=$SRCDIR/mediatek/config/$PROJECT/elink/$1
 CUSTOMCONF=$SRCDIR/mediatek/config/common/custom.conf
@@ -210,7 +210,12 @@ makeanimation()
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
-			mv "$f" "$TARGET"
+			if [ "$f" != "$TARGET" ];then
+				if [ "$f" != "$TARGET" ];then
+					mv "$f" "$TARGET"
+					echo mv 	"$f" "$TARGET"
+				fi
+			fi
 			echo mv 	"$f" "$TARGET"
 		done
 	fi
@@ -233,7 +238,7 @@ makeanimation()
 		NAME=`printf "%04d\n" ${INDEX}`
 		echo "mv $i $RESULT/part$k/${NAME}.$EXTENSION"
 		mv $i $RESULT/part$k/${NAME}.$EXTENSION
-		if [ "$EXTENSION" != "png" || "$EXTENSION" != "png" ];then
+		if [ "$EXTENSION" != "png" -a "$EXTENSION" != "PNG" ];then
 			convert $RESULT/part$k/${NAME}.$EXTENSION $RESULT/part$k/${NAME}.png
 			rm $RESULT/part$k/${NAME}.$EXTENSION
 		fi
@@ -298,7 +303,10 @@ makelogo()
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
-			mv "$f" "$TARGET"
+			if [ "$f" != "$TARGET" ];then
+				mv "$f" "$TARGET"
+				echo mv 	"$f" "$TARGET"
+			fi
 			echo mv 	"$f" "$TARGET"
 		done
 	fi
@@ -349,7 +357,10 @@ if [ ! -z "$WALLPAPER" ];then
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
-			mv "$f" "$TARGET"
+			if [ "$f" != "$TARGET" ];then
+					mv "$f" "$TARGET"
+					echo mv 	"$f" "$TARGET"
+				fi
 			echo mv 	"$f" "$TARGET"
 		done
 	fi
@@ -382,8 +393,10 @@ if [ ! -z "$APKHANDLE" ];then
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
-			mv "$f" "$TARGET"
-			echo mv 	"$f" "$TARGET"
+			if [ "$f" != "$TARGET" ];then
+				mv "$f" "$TARGET"
+				echo mv "$f" "$TARGET"
+			fi
 		done
 	fi
 
@@ -420,7 +433,7 @@ if [ ! -z "$APKHANDLE" ];then
 			cp -p $i $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
 			cp -p $PATCHDIR/Android.mk $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
 			sed -i "/LOCAL_MODULE :=/s/:=.*/:= $APKNAME/" $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/Android.mk
-			sed -i '/ElinkEngineerMode/s/^/    '$APKNAME' \\ \n/' $SRCDIR/vendor/common/SYSTEM_APP/products/APPS.mk
+			sed -i '/ElinkEng.*/s/^/    '$APKNAME' \\ \n/' $SRCDIR/vendor/common/SYSTEM_APP/products/APPS.mk
 		done
 		rm * -r
 		cd $CONFIGDIR
@@ -459,7 +472,10 @@ if [ ! -z "$EXTRAWALLPAPER" ];then
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
-			mv "$f" "$TARGET"
+			if [ "$f" != "$TARGET" ];then
+				mv "$f" "$TARGET"
+				echo mv "$f" "$TARGET"
+			fi
 			echo mv 	"$f" "$TARGET"
 		done
 	fi
