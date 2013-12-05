@@ -211,10 +211,8 @@ makeanimation()
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			if [ "$f" != "$TARGET" ];then
-				if [ "$f" != "$TARGET" ];then
 					mv "$f" "$TARGET"
 					echo mv 	"$f" "$TARGET"
-				fi
 			fi
 		done
 	fi
@@ -357,8 +355,8 @@ if [ ! -z "$WALLPAPER" ];then
 			TARGET=`echo "$f" | tr -d ' '`
 			if [ "$f" != "$TARGET" ];then
 					mv "$f" "$TARGET"
-					echo mv 	"$f" "$TARGET"
-				fi
+					echo mv "$f" "$TARGET"
+			fi
 		done
 	fi
 	convert * default_wallpaper.jpg 
