@@ -15,6 +15,8 @@ PROFILE=$SRCDIR/mediatek/config/$PROJECT/elink/$1
 COMMONPROFILE=$SRCDIR/mediatek/config/common
 CUSTOMCONF=$SRCDIR/mediatek/config/common/custom.conf
 DEFAULTXML=$SRCDIR/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+BULIDFILE=$SRCDIR/build/target/product/core.mk
+SOUNDSDIR=$SRCDIR/frameworks/base/data/sounds
 CONFILE="$CONFIGDIR/config.ini"
 RENAME="false"
 
@@ -623,6 +625,41 @@ if [ ! -z "$OPENROOT" ]; then
 	fi
 fi
 
+#默认来电铃声
+DEFAULTRINGTONE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认来电铃声/)print $2}' $CONFILE`
+RINGTONEDIR=$CONFIGDIR/custom/默认来电铃声
+if [ ! -z "$DEFAULTRINGTONE" ]; then
+	echo ">>>>>Change default ringtone!!"
+	cd $RINGTONEDIR
+
+	FILES=`ls`
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
+	if [ -z "$FILES" ];then
+		echo "no default wallpaper source picture!!!"
+		return
+	fi
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr " " "_"`
+			if [ "$f" != "$TARGET" ];then
+				mv "$f" "$TARGET"
+				echo mv "$f" "$TARGET"
+			fi
+		done
+	fi
+	if [ $NF = "1" ]; then
+		RINGFILE=`ls`
+		cp $RINGTONEDIR/$RINGFILE $SOUNDSDIR/ringtones
+		sed -i "/ro.config.ringtone/s/=/=$RINGFILE /" $BULIDFILE
+		sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/ringtones/'$RINGFILE':system/media/audio/ringtones/'$RINGFILE' \\' $SOUNDSDIR/AudioPackage2.mk
+		rm $RINGTONEDIR/$RINGFILE
+	else
+		echo "ERROR More than one audio file."
+	fi
+fi
 
 
 echo "Begin to build your project?(y/n)"
