@@ -636,7 +636,7 @@ if [ ! -z "$DEFAULTRINGTONE" ]; then
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
-		echo "no default wallpaper source picture!!!"
+		echo "no default ringtone source file!!!"
 		return
 	fi
 	if [  $NF -ne $FNF ];then	
@@ -653,7 +653,7 @@ if [ ! -z "$DEFAULTRINGTONE" ]; then
 	if [ $NF = "1" ]; then
 		RINGFILE=`ls`
 		cp $DEFAULTRINGTONEDIR/$RINGFILE $SOUNDSDIR/ringtones
-		sed -i "/ro.config.ringtone/s/=/=$RINGFILE /" $BULIDFILE
+		sed -i "/ro.config.ringtone/s/=.*/=$RINGFILE /" $BULIDFILE
 		sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/ringtones/'$RINGFILE':system/media/audio/ringtones/'$RINGFILE' \\' $SOUNDSDIR/AudioPackage2.mk
 		rm $DEFAULTRINGTONEDIR/$RINGFILE
 	else
@@ -694,7 +694,79 @@ if [ ! -z "$EXTRARINGTONE" ]; then
 			sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/ringtones/'$f':system/media/audio/ringtones/'$f' \\' $SOUNDSDIR/AudioPackage2.mk
 		done
 	fi
+	rm $EXTRARINGTONEDIR/*
+fi
 
+#默认通知铃声
+DEFAULNOTIFICATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认通知铃声/)print $2}' $CONFILE`
+DEFAULNOTIFICATIONDIR=$CONFIGDIR/custom/默认通知铃声
+if [ ! -z "$DEFAULNOTIFICATION" ]; then
+	echo ">>>>>Change default notifications!!"
+	cd $DEFAULNOTIFICATIONDIR
+
+	FILES=`ls`
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
+	if [ -z "$FILES" ];then
+		echo "no default notification source file!!!"
+		return
+	fi
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr " " "_"`
+			if [ "$f" != "$TARGET" ];then
+				mv "$f" "$TARGET"
+				echo mv "$f" "$TARGET"
+			fi
+		done
+	fi
+	if [ $NF = "1" ]; then
+		NOTIFICATIONFILE=`ls`
+		cp $DEFAULNOTIFICATIONDIR/$NOTIFICATIONFILE $SOUNDSDIR/notifications
+		sed -i '/ro.config.notification_sound/s/=.*/='$NOTIFICATIONFILE' \\/' $BULIDFILE
+		sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/notifications/'$NOTIFICATIONFILE':system/media/audio/notifications/'$NOTIFICATIONFILE' \\' $SOUNDSDIR/AudioPackage2.mk
+		rm $DEFAULNOTIFICATIONDIR/$NOTIFICATIONFILE
+	else
+		echo "ERROR More than one audio file."
+	fi
+fi
+
+#备选通知铃声
+EXTRANOTIFICATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^备选通知铃声/)print $2}' $CONFILE`
+EXTRANOTIFICATIONDIR=$CONFIGDIR/custom/备选通知铃声
+if [ ! -z "$EXTRANOTIFICATION" ]; then
+	echo ">>>>>Add extra notifications!!"
+	cd $EXTRANOTIFICATIONDIR
+
+	FILES=`ls`
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
+	if [ -z "$FILES" ];then
+		echo "no extra notification source file!!!"
+		return
+	fi
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr " " "_"`
+			if [ "$f" != "$TARGET" ];then
+				mv "$f" "$TARGET"
+				echo mv "$f" "$TARGET"
+				cp $EXTRANOTIFICATIONDIR/$f $SOUNDSDIR/notifications
+				sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/notifications/'$f':system/media/audio/notifications/'$f' \\' $SOUNDSDIR/AudioPackage2.mk
+			fi
+		done
+	else
+		for f in `ls ./`
+		do
+			cp $EXTRANOTIFICATIONDIR/$f $SOUNDSDIR/notifications
+			sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/notifications/'$f':system/media/audio/notifications/'$f' \\' $SOUNDSDIR/AudioPackage2.mk
+		done
+	fi
+	rm $EXTRANOTIFICATIONDIR/*
 fi
 
 echo "Begin to build your project?(y/n)"
