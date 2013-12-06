@@ -627,10 +627,10 @@ fi
 
 #默认来电铃声
 DEFAULTRINGTONE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认来电铃声/)print $2}' $CONFILE`
-RINGTONEDIR=$CONFIGDIR/custom/默认来电铃声
+DEFAULTRINGTONEDIR=$CONFIGDIR/custom/默认来电铃声
 if [ ! -z "$DEFAULTRINGTONE" ]; then
 	echo ">>>>>Change default ringtone!!"
-	cd $RINGTONEDIR
+	cd $DEFAULTRINGTONEDIR
 
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
@@ -652,15 +652,50 @@ if [ ! -z "$DEFAULTRINGTONE" ]; then
 	fi
 	if [ $NF = "1" ]; then
 		RINGFILE=`ls`
-		cp $RINGTONEDIR/$RINGFILE $SOUNDSDIR/ringtones
+		cp $DEFAULTRINGTONEDIR/$RINGFILE $SOUNDSDIR/ringtones
 		sed -i "/ro.config.ringtone/s/=/=$RINGFILE /" $BULIDFILE
 		sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/ringtones/'$RINGFILE':system/media/audio/ringtones/'$RINGFILE' \\' $SOUNDSDIR/AudioPackage2.mk
-		rm $RINGTONEDIR/$RINGFILE
+		rm $DEFAULTRINGTONEDIR/$RINGFILE
 	else
 		echo "ERROR More than one audio file."
 	fi
 fi
 
+#备选来电铃声
+EXTRARINGTONE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^备选来电铃声/)print $2}' $CONFILE`
+EXTRARINGTONEDIR=$CONFIGDIR/custom/备选来电铃声
+if [ ! -z "$EXTRARINGTONE" ]; then
+	echo ">>>>>Add extra ringtone!!"
+	cd $EXTRARINGTONEDIR
+
+	FILES=`ls`
+	NF=`ls -l |grep "^-"|wc -l`
+	FNF=`echo $FILES | awk '{print NF}'`
+	if [ -z "$FILES" ];then
+		echo "no extra ringtone source file!!!"
+		return
+	fi
+	if [  $NF -ne $FNF ];then	
+		echo "Rename because any filename has blank!!!"
+		for f in `ls ./ | tr " " "\?"`
+		do
+			TARGET=`echo "$f" | tr " " "_"`
+			if [ "$f" != "$TARGET" ];then
+				mv "$f" "$TARGET"
+				echo mv "$f" "$TARGET"
+				cp $EXTRARINGTONEDIR/$f $SOUNDSDIR/ringtones
+				sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/ringtones/'$f':system/media/audio/ringtones/'$f' \\' $SOUNDSDIR/AudioPackage2.mk
+			fi
+		done
+	else
+		for f in `ls ./`
+		do
+			cp $EXTRARINGTONEDIR/$f $SOUNDSDIR/ringtones
+			sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/ringtones/'$f':system/media/audio/ringtones/'$f' \\' $SOUNDSDIR/AudioPackage2.mk
+		done
+	fi
+
+fi
 
 echo "Begin to build your project?(y/n)"
 read CMD
