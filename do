@@ -342,6 +342,9 @@ elif [ $1 = "shut" ];then
 	done
 fi
 zip ./$RESULT ./* ./desc.txt -r -0
+if [ ! -e $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/ ];then
+	mkdir -p $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
+fi
 cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
 rm ../* -r
 echo "make $RESULT successfully ===========> OK"
@@ -398,7 +401,7 @@ makelogo()
 		done
 	fi
 
-	if [ $PROJECT = "md706" ];then
+	if [ $PROJECT = "md706" -o $PROJECT = "md708" -o $PROJECT = "mr706" ];then
 		if [ $DENSITY = "L" ];then
 			convert * cu_wvga_$1.bmp
 			cp -p cu_wvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_wvga/
@@ -408,8 +411,24 @@ makelogo()
 			cp -p wsvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wsvga/
 			rm *
 		fi
-	elif [ $PROJECT = "md790" ];then
-		echo "MD790"
+	elif [ $PROJECT = "md790" -o $PROJECT = "mr790" ];then 
+			convert * xga_$1.bmp
+			cp -p xga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/xga/
+			rm *
+	elif [ $PROJECT = "md601" -o $PROJECT = "md680" ];then
+			convert * cu_qhd_$1.bmp
+			cp -p cu_qhd_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_qhd/
+			rm *
+	elif [ $PROJECT = "md900" -o $PROJECT = "md100" ];then
+		if [ $DENSITY = "L" ];then
+			convert * wvgalnl_$1.bmp
+			cp -p wvgalnl_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wvgalnl/
+			rm *
+		elif [ $DENSITY = "H" ];then  
+			convert * wsvganl_$1.bmp
+			cp -p wsvganl_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wsvganl/
+			rm *
+		fi
 	fi
 	echo "make $1 logo  successfully ===========> OK"
 	cd $CONFIGDIR
