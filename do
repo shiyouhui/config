@@ -531,7 +531,7 @@ if [ ! -z "$APKHANDLE" ];then
 			cp -p $i $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
 			cp -p $PATCHDIR/Android.mk $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
 			sed -i "/LOCAL_MODULE :=/s/:=.*/:= $APKNAME/" $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/Android.mk
-			sed -i '/ElinkEng.*/s/^/    '$APKNAME' \\ \n/' $SRCDIR/vendor/common/SYSTEM_APP/products/APPS.mk
+			sed -i '/ElinkEng.*/s/^/    '$APKNAME' \\\n/' $SRCDIR/vendor/common/SYSTEM_APP/products/APPS.mk
 		done
 		rm * -r
 		cd $CONFIGDIR
