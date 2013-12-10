@@ -325,6 +325,10 @@ makeanimation()
 			rm $RESULT/part$k/${NAME}.$EXTENSION
 		fi
 	done
+	echo $k
+	if [ $k = "0" ];then
+		mkdir -p $RESULT/part1
+	fi
 
 	cd $RESULT
 
