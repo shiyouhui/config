@@ -160,7 +160,13 @@ if [ ! -z "$DISKLABEL" ];then
 	cd $SRCDIR/system/core
 	git apply --ignore-whitespace $PATCHDIR/lowcase.patch  
 	cd ../vold
-	git  apply --ignore-whitespace $PATCHDIR/parttion_label.patch 
+
+	PRO=`expr substr $PROJECT 1 2`
+	if [ $PRO = "md" ];then
+		git  apply --ignore-whitespace $PATCHDIR/parttion_label.patch 
+	elif [ $PRO = "mr" ]; then
+		git  apply --ignore-whitespace $PATCHDIR/mr_parttion_label.patch 
+	fi
 	sed -i "/display label/s/\".*\"/\"$DISKLABEL\"/" ./Fat.cpp 
 	cd $CONFIGDIR
 	if [ ! -z "$UPDATERECORD" ];then

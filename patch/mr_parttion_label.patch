@@ -1,0 +1,173 @@
+diff --git a/Fat.cpp b/Fat.cpp
+index 8a0e1da..bf8d30b 100644
+--- a/Fat.cpp
++++ b/Fat.cpp
+@@ -530,16 +530,16 @@ int Fat::doMount(const char *fsPath, const char *mountPoint,
+ 
+     return rc;
+ }
++//thh modefied
+ 
+-
+-int Fat::format(const char *fsPath, unsigned int numSectors) {
++int Fat::format(const char *fsPath, unsigned int numSectors,bool isInternalSd) {
+     int fd;
+     const char *args[11];
+     int rc;
+-#ifndef MTK_FORMAT_NOT_PARAM_CLUSTER
++//thh delete #ifndef MTK_FORMAT_NOT_PARAM_CLUSTER
+     unsigned int bps;
+     unsigned int bsize;
+-#endif
++//thh delete #endif
+     if (-1 == (fd = open(fsPath, O_RDONLY, 0644)) )
+     {
+         SLOGE("failed to open %s\n", fsPath);
+@@ -548,28 +548,94 @@ int Fat::format(const char *fsPath, unsigned int numSectors) {
+     }
+     args[0] = MKDOSFS_PATH;
+     
+-#ifdef MTK_FORMAT_NOT_PARAM_CLUSTER
+-    args[1] = "-O";
+-    args[2] = "android";
+-    close(fd);
++//thh delete #ifdef MTK_FORMAT_NOT_PARAM_CLUSTER
++    args[1] = "-F";		//thh modified from O to F
++ //thh delete   args[2] = "android";
++//thh add
++	 if (ioctl(fd, BLKSSZGET, &bps))
++    {
++        bps = 0;
++        SLOGE("failed to get %s bytes/sector\n", fsPath);
++    }
++    if (ioctl(fd, BLKGETSIZE, &bsize))
++    {
++        bsize = 0;
++        SLOGE("failed to get %s device size\n", fsPath);
++    }
++//thh add end
++	close(fd);
++//thh add
++	 SLOGD("total cluster is %d", ( (unsigned long long)bsize * 512) / (bps * 8));
++    
++    if (!numSectors && bps && bsize)
++    {
++        if ( (((unsigned long long)bsize * 512) / (bps * 8)) > 65536 )
++            args[2] = "32";
++        else
++            args[2] = "16";
++    }
++    else
++        args[2] = "32";
++
++    args[3] = "-O";
++    args[4] = "android";
++    args[5] = "-c";
++    args[6] = "8";
++
++    SLOGD("%s %s %s %s %s %s %s", args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
++//thh add end
+     if (numSectors) {
+         char tmp[32];
+         snprintf(tmp, sizeof(tmp), "%u", numSectors);
+         const char *size = tmp;
+-        args[3] = "-s";
+-        args[4] = size;
+-        args[5] = fsPath;
+-        args[6] = NULL;
+-        SLOGD("%s %s %s %s %s %s", args[0], args[1], args[2], args[3], args[4], args[5]);
+-        rc = logwrap(7, args, 1);
++        args[7] = "-s";
++        args[8] = size;
++        args[9] = fsPath;
++        args[10] = NULL;
++        rc = logwrap(11, args, 1);
+     } else {
+-        args[3] = fsPath;
+-        args[4] = NULL;
+-        SLOGD("%s %s %s %s", args[0], args[1], args[2], args[3]);
+-        rc = logwrap(5, args, 1);
++    	/***modify by xiangxiang***/
++    	 if (isInternalSd){
++   				args[7] = "-L";
++   				args[8] = "PF71";       // modify your label here
++   				args[9] = fsPath;
++   				args[10] = NULL;
++   				rc = logwrap(11, args, 1);
++      	}else{
++        args[7] = fsPath;
++        args[8] = NULL;
++        rc = logwrap(9, args, 1);
++      }
++       /****end****/
+     }
+-    
+-#else
++
++    if (rc == 0) {
++        SLOGI("Filesystem formatted OK");
++        return 0;
++    } else {
++        SLOGE("Format failed (unknown exit code %d)", rc);
++        errno = EIO;
++        return -1;
++    }
++    return 0;
++}
++/***end****/
++
++int Fat::format(const char *fsPath, unsigned int numSectors) {
++    int fd;
++    const char *args[11];
++    int rc;
++    unsigned int bps;
++    unsigned int bsize;
++
++    if (-1 == (fd = open(fsPath, O_RDONLY, 0644)) )
++    {
++        SLOGE("failed to open %s\n", fsPath);
++        errno = EIO;
++        return -1;
++    }
++
++    args[0] = MKDOSFS_PATH;
+     args[1] = "-F";
+    // args[2] = "32";
+     if (ioctl(fd, BLKSSZGET, &bps))
+@@ -617,7 +683,7 @@ int Fat::format(const char *fsPath, unsigned int numSectors) {
+         args[8] = NULL;
+         rc = logwrap(9, args, 1);
+     }
+-#endif
++//thh delete #endif
+     if (rc == 0) {
+         SLOGI("Filesystem formatted OK");
+         return 0;
+diff --git a/Fat.h b/Fat.h
+index 38f98e6..6a9d1b0 100644
+--- a/Fat.h
++++ b/Fat.h
+@@ -36,6 +36,9 @@ public:
+                        bool ro, bool remount, bool executable,
+                        int ownerUid, int ownerGid, int permMask,
+                        bool createLost);
++//thh add
++static int format(const char *fsPath, unsigned int numSectors, bool isInternalSd);
++//add end
+     static int format(const char *fsPath, unsigned int numSectors);
+ };
+ 
+diff --git a/Volume.cpp b/Volume.cpp
+index 0fea5dc..369b4c3 100644
+--- a/Volume.cpp
++++ b/Volume.cpp
+@@ -488,7 +488,8 @@ __CHECK_FAT_AGAIN:
+ #ifdef MTK_EMMC_SUPPORT
+             if ( mVm->isFirstBoot() && IsEmmcStorage()) {
+                 SLOGI("** This is first boot and internal sd is not formatted. Try to format it. (%s)\n", devicePath);
+-			    if (Fat::format(devicePath, 0)) {
++                 /****modify by xiangxiang***/
++                 if (Fat::format(devicePath, 0,IsEmmcStorage())) {
+ 				  SLOGE("Failed to format (%s)", strerror(errno));				  
+ 			    }
+                 else {
