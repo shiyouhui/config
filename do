@@ -486,7 +486,13 @@ if [ ! -z "$WALLPAPER" ];then
 		done
 	fi
 	convert * default_wallpaper.jpg 
-	cp -p  default_wallpaper.jpg $SRCDIR/frameworks/base/core/res/res/drawable-nodpi/
+	PRO=`expr substr $PROJECT 1 2`
+	if [ $PRO = "md" ];then
+		cp -p  default_wallpaper.jpg $SRCDIR/frameworks/base/core/res/res/drawable-nodpi/
+	elif [ $PRO = "mr" ]; then
+		cp -p  default_wallpaper.jpg $SRCDIR/frameworks/base/core/res/res/drawable-xhdpi/
+	fi
+	
 	rm * -r
 	echo "Change default  wallpaper  successfully ===========> OK"
 	cd $SRCDIR
