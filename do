@@ -549,7 +549,7 @@ if [ ! -z "$APKHANDLE" ];then
 		for i in `ls`
 		do
 			echo "copy $i to system_app"
-			APKNAME=`echo $i | awk -F"." '{print $1}'`
+			APKNAME=${i%\.*}
 			mkdir -p  $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME
 			cp -p $i $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
 			cp -p $PATCHDIR/Android.mk $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
