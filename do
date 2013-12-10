@@ -628,7 +628,13 @@ if [ ! -z "$EXTRAWALLPAPER" ];then
 		convert -resize 213x189 wallpaper_extra_"$INDEX"."$EXTENSION" wallpaper_extra_"$INDEX"_small.$EXTENSION
 		cp  wallpaper_extra_"$INDEX"."$EXTENSION" $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
 		cp  wallpaper_extra_"$INDEX"_small.$EXTENSION $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
-		sed -i "/wallpapers/s/$/\n        <item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values/wallpapers.xml
+		PRO=`expr substr $PROJECT 1 2`
+		if [ $PRO = "md" ];then
+			sed -i "/wallpapers/s/$/\n        <item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values/wallpapers.xml
+		elif [ $PRO = "mr" ]; then
+			sed -i "/wallpapers/s/$/\n        <item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values-sw600dp/wallpapers.xml
+		fi
+		
 		INDEX=`expr $INDEX + 1` 
 	done
 	rm * -r
