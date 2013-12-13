@@ -504,8 +504,6 @@ if [ ! -z "$APKHANDLE" ];then
 		mkdir -p $BACKUPDIR
 	fi
 
-
-
 	if [ "$APKHANDLE" -eq "1" ];then
 		for i in `ls`
 		do
