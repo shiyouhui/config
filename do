@@ -18,49 +18,25 @@ DEFAULTXML=$SRCDIR/frameworks/base/packages/SettingsProvider/res/values/defaults
 BULIDFILE=$SRCDIR/build/target/product/core.mk
 SOUNDSDIR=$SRCDIR/frameworks/base/data/sounds
 CONFILE="$CONFIGDIR/config.ini"
-RENAME="false"
 
 #生成修改记录
-UPDATERECORD=`awk -F"=" '{if(/^生成修改记录/)print $2}' $CONFILE`
-if [ ! -z "$UPDATERECORD" ];then
-	echo ">>>>>Generate change record:修改记录.txt"
-	cd $SRCDIR
-	if [ -f "$SRCDIR/修改记录.txt" ]; then
-		echo "\n$(date +%Y-%m-%d)" >> $SRCDIR/修改记录.txt
-		RENAME="true"
-	else
-		touch 修改记录.txt
-		DATE=`awk -F"=" '{if(/^需求日期/)print $2}' $CONFILE`
-		if [ ! -z "$DATE" ]; then
-			echo "修改记录:\n\n需求日期:$DATE" > 修改记录.txt			
-		else
-			echo "修改记录:\n\n需求日期:$(date +%Y%m%d)" > 修改记录.txt		
-		fi
-	fi
+touch 修改记录.txt
+DATE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^需求日期/)print $2}' $CONFILE`
+if [ "$DATE" = "请输入" ]; then
+	echo "修改记录:\n\n需求日期:$(date +%Y%m%d)" > 修改记录.txt		
+else
+	echo "修改记录:\n\n需求日期:$DATE" > 修改记录.txt	
 fi
+
 
 #修改机型名
 MODELNAME=`awk -F"=" '{if(/^机型名称/)print $2}' $CONFILE`
 if [ ! -z "$MODELNAME" ];then
 	echo ">>>>>Configurate Model Name = $MODELNAME"
-	sed -i "/^PRODUCT_MODEL/s/=.*/=$MODELNAME/" $PROFILE/elink_ID.mk
-	if [ ! -z "$UPDATERECORD" ];then
-		if [ $RENAME = "true" ]; then
-			echo "修改机型名称:$MODELNAME" >> $SRCDIR/修改记录.txt
-		else
-			echo "客户机型:$MODELNAME\n" >> $SRCDIR/修改记录.txt
-			echo "$(date +%Y-%m-%d)" >> $SRCDIR/修改记录.txt
-			echo "修改机型名称:$MODELNAME" >> $SRCDIR/修改记录.txt
-		fi
-
-	fi
+	sed -i "/^PRODUCT_MODEL/s/=.*/=$MODELNAME/" $PROFILE/elink_ID.mk	
+	echo "客户机型:$MODELNAME\n" >> $SRCDIR/修改记录.txt
 else
-	if [ ! -z "$UPDATERECORD" ];then
-		if [ $RENAME = "false" ]; then
-			echo "客户机型:$1\n" >> $SRCDIR/修改记录.txt
-			echo "$(date +%Y-%m-%d)" >> $SRCDIR/修改记录.txt
-		fi
-	fi 
+	echo "客户机型:$1\n" >> $SRCDIR/修改记录.txt
 fi
 
 #修改蓝牙名称
@@ -68,9 +44,7 @@ BLUETOOTHNAME=`awk -F"=" '{if(/^蓝牙名称/)print $2}' $CONFILE`
 if [ ! -z "$BLUETOOTHNAME" ];then
 	echo ">>>>>Configurate Bluetooth Name = $BLUETOOTHNAME "
 	sed -i "/^bluetooth/s/=.*/=$BLUETOOTHNAME/" $CUSTOMCONF
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改蓝牙名称:$BLUETOOTHNAME" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改蓝牙名称:$BLUETOOTHNAME" >> $SRCDIR/修改记录.txt
 fi
 
 #修改Wifi共享热点SSID
@@ -78,9 +52,7 @@ WLANSSID=`awk -F"=" '{if(/^共享SSID名称/)print $2}' $CONFILE`
 if [ ! -z "$WLANSSID" ];then
 	echo ">>>>>Configurate WLAN_SSID Display Label = $WLANSSID"
 	sed -i "/^wlan.SSID/s/=.*/=$WLANSSID/" $CUSTOMCONF
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改Wifi共享热点SSID:$WLANSSID" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改Wifi共享热点SSID:$WLANSSID" >> $SRCDIR/修改记录.txt
 fi
 
 #修改编译版本
@@ -88,9 +60,7 @@ BUILDVERSION=`awk -F"=" '{if(/^编译版本/)print $2}' $CONFILE`
 if [ ! -z "$BUILDVERSION" ];then
 	echo ">>>>>Configurate Build version = $BUILDVERSION"
 	sed -i "/^ELINK_VERSION/s/=.*/=$BUILDVERSION/" $PROFILE/elink_ID.mk
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改编译版本:$BUILDVERSION" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改编译版本:$BUILDVERSION" >> $SRCDIR/修改记录.txt
 fi
 
 #修改自定义编译版本
@@ -98,9 +68,7 @@ CUSTOMBUILDVERSION=`awk -F"=" '{if(/^自定义编译版本/)print $2}' $CONFILE`
 if [ ! -z "$CUSTOMBUILDVERSION" ];then
 	echo ">>>>>Configurate Customer build version = $CUSTOMBUILDVERSION"
 	sed -i "/^CUSTOM_BUILD_VERNO/s/=.*/=$CUSTOMBUILDVERSION/" $SRCDIR/mediatek/config/common/ProjectConfig.mk
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改自定义编译版本:$CUSTOMBUILDVERSION" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改自定义编译版本:$CUSTOMBUILDVERSION" >> $SRCDIR/修改记录.txt
 fi
 
 #修改时区
@@ -108,9 +76,7 @@ TIMEZONE=`awk -F"=" 'gsub(/\//,"\\\/"){if(/^时区/)print $2}' $CONFILE`
 if [ ! -z "$TIMEZONE" ];then
 	echo ">>>>>Configurate Timezone = $TIMEZONE"
 	sed -i "/^persist.sys.timezone/s/=.*/=$TIMEZONE/" $PROFILE/system.prop
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改时区:$TIMEZONE" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改时区:$TIMEZONE" >> $SRCDIR/修改记录.txt
 fi
 
 #修改默认亮度
@@ -118,9 +84,7 @@ BRIGHTNESS=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认亮度/)print $2}' 
 if [ ! -z "$BRIGHTNESS" ];then
 	echo ">>>>>Configurate Screen brightness = $BRIGHTNESS"
 	sed -i "/\"def_screen_brightness\"/s/>.*</>$BRIGHTNESS</" $DEFAULTXML
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改默认亮度:$BRIGHTNESS" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改默认亮度:$BRIGHTNESS" >> $SRCDIR/修改记录.txt
 fi
 
 #修改屏幕延时
@@ -128,9 +92,7 @@ SCREENTIMEOUT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^屏幕延时/)print $2
 if [ ! -z "$SCREENTIMEOUT" ];then
 	echo ">>>>>Configurate screen timeout = $SCREENTIMEOUT"
 	sed -i "/\"def_screen_off_timeout\"/s/>.*</>$SCREENTIMEOUT</" $DEFAULTXML
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改屏幕延时:$(`expr $SCREENTIMEOUT \/ 1000`)秒" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改屏幕延时:$(`expr $SCREENTIMEOUT \/ 1000`)秒" >> $SRCDIR/修改记录.txt
 fi
 
 #修改未知来源默认
@@ -138,9 +100,7 @@ UNKNOWSRC=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^未知来源/)print $2}' $
 if [ ! -z "$UNKNOWSRC" ];then
 	echo ">>>>>Unkownsource selected = $UNKNOWSRC"
 	sed -i "/\"def_install_non_market_apps\"/s/>.*</>$UNKNOWSRC</" $DEFAULTXML
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "默认打开未知来源选项" >> $SRCDIR/修改记录.txt
-	fi
+	echo "默认打开未知来源选项" >> $SRCDIR/修改记录.txt
 fi
 
 #修改默认输入法
@@ -148,9 +108,7 @@ INPUTMETHOD=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认输入法/)print $
 if [ ! -z "$INPUTMETHOD" ];then
 	echo ">>>>>Modify default input_method = $INPUTMETHOD"
 	sed -i "/^DEFAULT_INPUT_METHOD/s/=.*/=$INPUTMETHOD/" $PROFILE/ProjectConfig.mk
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改默认输入法:$INPUTMETHOD" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改默认输入法:$INPUTMETHOD" >> $SRCDIR/修改记录.txt
 fi
 
 #修改可移动磁盘名
@@ -167,11 +125,10 @@ if [ ! -z "$DISKLABEL" ];then
 	elif [ $PRO = "mr" ]; then
 		git  apply --ignore-whitespace $PATCHDIR/mr_parttion_label.patch 
 	fi
+
 	sed -i "/display label/s/\".*\"/\"$DISKLABEL\"/" ./Fat.cpp 
 	cd $CONFIGDIR
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改可移动磁盘名:$DISKLABEL" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改可移动磁盘名:$DISKLABEL" >> $SRCDIR/修改记录.txt
 fi
 
 #修改联机ID
@@ -179,12 +136,10 @@ ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CO
 if [ ! -z "$ONLINELABEL" ];then
 	echo ">>>>>Modify line_label = $ONLINELABEL"
 	cd $SRCDIR/kernel/drivers
-	git apply --ignore-whitespace $PATCHDIR/usbid_label.path
+	git apply --ignore-whitespace $PATCHDIR/usbid_label.patch
 	sed -i "/id display label1/s/\".*\"/\"$ONLINELABEL\"/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
 	sed -i "/id display label2/s/\".*\"/\"$ONLINELABEL\"/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改联机ID:$ONLINELABEL" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改联机ID:$ONLINELABEL" >> $SRCDIR/修改记录.txt
 fi
 
 #修改浏览器主页
@@ -192,11 +147,9 @@ HOMEPAGE=`awk -F"=" 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器�
 if [ ! -z "$HOMEPAGE" ];then
 	echo ">>>>>Modify default Browse Homepage = `expr substr $HOMEPAGE 10 20`"
 	cd $SRCDIR/packages/apps/Browser
-	git apply --ignore-whitespace $PATCHDIR/homepage.path
+	git apply --ignore-whitespace $PATCHDIR/homepage.patch
 	sed -i "/default homepage/s/,.*);/,\"$HOMEPAGE\");/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改浏览器主页:$HOMEPAGE" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改浏览器主页:$HOMEPAGE" >> $SRCDIR/修改记录.txt
 fi
 
 #修改前摄像头插值
@@ -211,14 +164,13 @@ if  [ ! -z "$SUBCAMERA" ];then
 	else
 		echo "摄像头像素 30 200 500 万"
 	fi
+
 	echo ">>>>>Modify subcamera = $SUBSIZE"
 	cd $SRCDIR/mediatek/custom/mt6577/
 	git apply $PATCHDIR/subcamera.patch
 	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $SUBSIZE 14 10`),/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_sub.h
 	sed -i "/$SUBSIZE,/s/$SUBSIZE,.*/$SUBSIZE/" $SRCDIR/mediatek/custom/mt6577/hal/camera/camera/cfg_ftbl_custom_yuv_sub.h
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改前摄像头插值:$SUBCAMERA" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改前摄像头插值:$SUBCAMERA" >> $SRCDIR/修改记录.txt
 fi
 
 #修改后摄像头插值
@@ -233,6 +185,7 @@ if  [ ! -z "$MAINCAMERA" ];then
 	else
 		echo "摄像头像素 30 200 500 万"
 	fi
+
 	echo ">>>>>Modify subcamera = $MAINSIZE"
 	cd $SRCDIR/mediatek/custom/mt6577/
 	git apply $PATCHDIR/maincamera_1.patch
@@ -243,9 +196,7 @@ if  [ ! -z "$MAINCAMERA" ];then
 	git apply $PATCHDIR/maincamera_2.patch
 	sed -i "/BY_DEFAULT(CAPTURE_SIZE/s/CAPTURE_SIZE_.*/CAPTURE_SIZE_`expr substr $MAINSIZE 14 10`),/" $SRCDIR/mediatek/custom/$PROJECT/hal/camera/camera/cfg_ftbl_custom_raw_main.h
 	sed -i "/$MAINSIZE,/s/$MAINSIZE,.*/$MAINSIZE/" $SRCDIR/mediatek/custom/$PROJECT/hal/camera/camera/cfg_ftbl_custom_raw_main.h
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改后摄像头插值:$MAINCAMERA" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改后摄像头插值:$MAINCAMERA" >> $SRCDIR/修改记录.txt
 fi
 
 #修改默认情景模式
@@ -262,11 +213,10 @@ if [ ! -z "$ACTIVEPROFILE" ];then
 	else
 		echo "情景模式输入错误，请按可供选择输入(标准，静音，会议，户外)"
 	fi
+
 	echo ">>>>>Modify line_label = $ACTIVEPROFILE"
 	sed -i "/\"def_active_profile\"/s/>.*</>$RESULT</" $SRCDIR/frameworks/base/packages/SettingsProvider/res/values/mtk_defaults.xml
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改默认情景模式:$ACTIVEPROFILE" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改默认情景模式:$ACTIVEPROFILE" >> $SRCDIR/修改记录.txt
 fi
 
 #制作动画
@@ -284,97 +234,117 @@ makeanimation()
 		echo ">>>>>begin to make bootanimation"
 		cd $BOOTANIMATIONDIR
 		RESULT=bootanimation
+		TIMES=$BOOTTIMES
 	elif [ $1 = "shut" ];then
 		echo ">>>>>begin to make shutanimation"
 		cd $SHUTANIMATIONDIR
 		RESULT=shutanimation
+		TIMES=$SHUTTIMES
 	fi
+
 	FILES=`ls | sort -n`
-	NF=`ls -l |grep "^-"|wc -l`
+	NF=`ls -l | grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
 		echo "no animation source picture!!!"
 		return
 	fi
+
 	if [  $NF -ne $FNF ];then	
 		echo "Rename because any filename has blank!!!"
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			if [ "$f" != "$TARGET" ];then
-					mv "$f" "$TARGET"
-					echo mv 	"$f" "$TARGET"
+				mv "$f" "$TARGET"
+				echo mv "$f" "$TARGET"
 			fi
 		done
 	fi
-	FILES=`ls | sort -n | grep -v ".sh" | grep -v ".db" | grep -v ".txt" | grep -v "bootanimation"`
 
+	FILES=`ls | sort -n`
 	LASTONE=`echo $FILES| awk '{print $NF}'`
 	INDEX=0
 	EXTENSION=${LASTONE##*.}
 	WIDTH=`identify $LASTONE | awk '{print $3}' | awk -F"x" '{print $1}'`
 	HEIGHT=`identify $LASTONE | awk '{print $3}' | awk -F"x" '{print $2}'`
 
-	for i in ${FILES}
-	do 
-		INDEX=`expr $INDEX + 1` 
-		j=`echo "( $INDEX - 1 )%20" |bc`
-		k=`echo "( $INDEX - 1 )/20" |bc`
-		if [ $j -eq 0 ];then
-			mkdir -p $RESULT/part$k
-		fi
-		NAME=`printf "%04d\n" ${INDEX}`
-		echo "mv $i $RESULT/part$k/${NAME}.$EXTENSION"
-		mv $i $RESULT/part$k/${NAME}.$EXTENSION
-		if [ "$EXTENSION" != "png" -a "$EXTENSION" != "PNG" ];then
-			convert $RESULT/part$k/${NAME}.$EXTENSION $RESULT/part$k/${NAME}.png
-			rm $RESULT/part$k/${NAME}.$EXTENSION
-		fi
-	done
-	echo $k
+	if [ $TIMES = "0" ];then
+		mkdir -p $RESULT/part0
+		for i in ${FILES}
+		do 
+			INDEX=`expr $INDEX + 1` 
+			NAME=`printf "%04d\n" ${INDEX}`
+			echo "mv $i $RESULT/part0/${NAME}.$EXTENSION"
+			mv $i $RESULT/part0/${NAME}.$EXTENSION
+			if [ "$EXTENSION" != "png" -a "$EXTENSION" != "PNG" ];then
+				convert $RESULT/part0/${NAME}.$EXTENSION $RESULT/part$k/${NAME}.png
+				rm $RESULT/part0/${NAME}.$EXTENSION
+			fi
+		done
+		mkdir -p $RESULT/part1
+		cp $RESULT/part0/${NAME}.* $RESULT/part1/
+	else
+		for i in ${FILES}
+		do 
+			INDEX=`expr $INDEX + 1` 
+			j=`echo "( $INDEX - 1 )%20" |bc`
+			k=`echo "( $INDEX - 1 )/20" |bc`
+			
+			if [ $j -eq 0 ];then
+				mkdir -p $RESULT/part$k
+			fi
+			NAME=`printf "%04d\n" ${INDEX}`
+			echo "mv $i $RESULT/part$k/${NAME}.$EXTENSION"
+			mv $i $RESULT/part$k/${NAME}.$EXTENSION
+	
+			if [ "$EXTENSION" != "png" -a "$EXTENSION" != "PNG" ];then
+				convert $RESULT/part$k/${NAME}.$EXTENSION $RESULT/part$k/${NAME}.png
+				rm $RESULT/part$k/${NAME}.$EXTENSION
+			fi
+		done
+	fi
+
 	if [ $k = "0" ];then
 		mkdir -p $RESULT/part1
 	fi
 
 	cd $RESULT
 
-if [ $1 = "boot" ];then
-	echo "$WIDTH $HEIGHT $BOOTFPS" > desc.txt
-	for i in `ls -l | grep "^d" | awk '{print $8}'`
-	do
-		echo "p $BOOTTIMES 0 $i" >> desc.txt
-	done
-elif [ $1 = "shut" ];then
-	echo "$WIDTH $HEIGHT $SHUTFPS" > desc.txt
-	for i in `ls -l | grep "^-"`
-	do
-		echo "p $SHUTTIMES 0 $i" >> desc.txt
-	done
-fi
-zip ./$RESULT ./* ./desc.txt -r -0
-if [ ! -e $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/ ];then
-	mkdir -p $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
-fi
-cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
-rm ../* -r
-echo "make $RESULT successfully ===========> OK"
-cd $CONFIGDIR
+	if [ $1 = "boot" ];then
+		echo "$WIDTH $HEIGHT $BOOTFPS" > desc.txt
+		for i in `ls -l | grep "^d" | awk '{print $8}'`
+		do
+			echo "p $BOOTTIMES 0 $i" >> desc.txt
+		done
+	elif [ $1 = "shut" ];then
+		echo "$WIDTH $HEIGHT $SHUTFPS" > desc.txt
+		for i in `ls -l | grep "^d" | awk '{print $8}'`
+		do
+			echo "p $SHUTTIMES 0 $i" >> desc.txt
+		done
+	fi
+
+	zip ./$RESULT ./* ./desc.txt -r -0
+	if [ ! -e $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/ ];then
+		mkdir -p $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
+	fi
+	cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
+	rm ../* -r
+	echo "make $RESULT successfully ===========> OK"
+	cd $CONFIGDIR
 }
 
 #开机动画
 if [ ! -z "$BOOTANIMATION" ];then
 	makeanimation boot;
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "制作开机动画" >> $SRCDIR/修改记录.txt
-	fi
+	echo "制作开机动画" >> $SRCDIR/修改记录.txt
 fi
 
 #关机动画
 if [ ! -z "$SHUTANIMATION" ];then
 	makeanimation shut;
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "制作关机动画" >> $SRCDIR/修改记录.txt
-	fi
+	echo "制作关机动画" >> $SRCDIR/修改记录.txt
 fi
 
 #制作开机logo
@@ -447,17 +417,13 @@ makelogo()
 #开机第一屏logo
 if [ ! -z "$UBOOTLOGO" ];then
 	makelogo uboot
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改logo1" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改logo1" >> $SRCDIR/修改记录.txt
 fi
 
 #开机第二屏logo
 if [ ! -z "$KERNELLOGO" ];then
 	makelogo kernel
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改logo2" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改logo2" >> $SRCDIR/修改记录.txt
 fi
 
 #修改默认壁纸
@@ -496,9 +462,7 @@ if [ ! -z "$WALLPAPER" ];then
 	rm * -r
 	echo "Change default  wallpaper  successfully ===========> OK"
 	cd $SRCDIR
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改默认壁纸" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改默认壁纸" >> $SRCDIR/修改记录.txt
 fi
 
 #预置APK
@@ -554,9 +518,8 @@ if [ ! -z "$APKHANDLE" ];then
 		done
 		rm * -r
 		cd $CONFIGDIR
-		if [ ! -z "$UPDATERECORD" ];then
-			echo "预置APK(可卸载可恢复)" >> $SRCDIR/修改记录.txt
-		fi
+		echo "预置APK(可卸载可恢复)" >> $SRCDIR/修改记录.txt
+
 	elif [ "$APKHANDLE" -eq "2" ];then
 		for i in `ls`
 		do
@@ -570,9 +533,7 @@ if [ ! -z "$APKHANDLE" ];then
 		done
 		rm * -r
 		cd $CONFIGDIR
-		if [ ! -z "$UPDATERECORD" ];then
-			echo "预置APK(不可卸载)" >> $SRCDIR/修改记录.txt
-		fi
+		echo "预置APK(不可卸载)" >> $SRCDIR/修改记录.txt
 	elif [ "$APKHANDLE" -eq "3" ];then
 		echo "copy $i to app"
 		for i in `ls`
@@ -583,9 +544,7 @@ if [ ! -z "$APKHANDLE" ];then
 		done
 		rm * -r
 		cd $CONFIGDIR
-		if [ ! -z "$UPDATERECORD" ];then
-			echo "预置APK(可卸载不可恢复)" >> $SRCDIR/修改记录.txt
-		fi
+		echo "预置APK(可卸载不可恢复)" >> $SRCDIR/修改记录.txt
 	else
 		echo "ERROE:error apk handle!!!!"
 		return
@@ -639,9 +598,7 @@ if [ ! -z "$EXTRAWALLPAPER" ];then
 	done
 	rm * -r
 	cd $CONFIGDIR
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "预置壁纸:$NF张" >> $SRCDIR/修改记录.txt
-	fi
+	echo "预置壁纸:$NF张" >> $SRCDIR/修改记录.txt
 fi
 
 #默认语言
@@ -651,9 +608,7 @@ if [ ! -z "$LANGUAGE" ];then
 	sed -i "/DEFAULT_LATIN_IME_LANGUAGES/s/=.*/=$LANGUAGE/" $PROFILE/ProjectConfig.mk
 	sed -i "/MTK_PRODUCT_LOCALES/s/$LANGUAGE//" $PROFILE/ProjectConfig.mk
 	sed -i "/MTK_PRODUCT_LOCALES/s/=/=$LANGUAGE /" $PROFILE/ProjectConfig.mk
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "修改默认语言:$LANGUAGE" >> $SRCDIR/修改记录.txt
-	fi
+	echo "修改默认语言:$LANGUAGE" >> $SRCDIR/修改记录.txt
 fi
 
 #开启ROOT权限
@@ -661,9 +616,7 @@ OPENROOT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^开启ROOT权限/)print $2}
 if [ ! -z "$OPENROOT" ]; then
 	echo ">>>>>Open root permission"
 	sed -i "/^EK_ROOT_SUPPORT/s/=.*/=$OPENROOT/" $COMMONPROFILE/ProjectConfig.mk
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "开启ROOT权限" >> $SRCDIR/修改记录.txt
-	fi
+	echo "开启ROOT权限" >> $SRCDIR/修改记录.txt
 fi
 
 #默认来电铃声
@@ -814,16 +767,12 @@ echo "Begin to build your project?(y/n)"
 read CMD
 if [ $CMD = "y" ];then
 	cd $SRCDIR
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "Build finish $(date +%Y-%m-%d %H:%M:%S)" >> $SRCDIR/修改记录.txt
-		sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
-	fi
+	echo "Build finish $(date +%Y-%m-%d %H:%M:%S)" >> $SRCDIR/修改记录.txt
+	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
 	./make_user_project.sh $PROJECT $1 new	
 else
-	if [ ! -z "$UPDATERECORD" ];then
-		echo "未完..." >> $SRCDIR/修改记录.txt
-		sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
-	fi
+	echo "未完..." >> $SRCDIR/修改记录.txt
+	# sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
 	exit 1
 fi
 
