@@ -19,21 +19,34 @@ BULIDFILE=$SRCDIR/build/target/product/core.mk
 SOUNDSDIR=$SRCDIR/frameworks/base/data/sounds
 CONFILE="$CONFIGDIR/config.ini"
 
-#生成修改记录
-touch 修改记录.txt
-DATE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^需求日期/)print $2}' $CONFILE`
-if [ "$DATE" = "请输入" ]; then
-	echo "修改记录:\n\n需求日期:$(date +%Y%m%d)" > 修改记录.txt		
-else
-	echo "修改记录:\n\n需求日期:$DATE" > 修改记录.txt	
-fi
 
+
+#生成修改记录
+LASTTIME=`ls -l $SRCDIR | grep "修改记录" | awk '{printf("%s %s", $6, $7);}'` 
+SECOND_OLD=`date --date="$LASTTIME" +%s`
+SECOND_NEW=$(date +%s)
+HOUR=`echo "($SECOND_NEW - $SECOND_OLD)/3600" | bc`
+if [  $HOUR -gt 4 ];then
+	ISNEW=true
+	if [ -e $SRCDIR/修改记录.txt ];then
+		rm $SRCDIR/修改记录.txt
+	fi
+	touch $SRCDIR/修改记录.txt
+	DATE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/需求日期/)print $2}' $CONFILE`
+	if [ "$DATE" = "请输入" ]; then
+		echo "修改记录:\n\n需求日期:$(date +%Y%m%d)" > $SRCDIR/修改记录.txt	
+	else
+		echo "修改记录:\n\n需求日期:$DATE" > $SRCDIR/修改记录.txt	
+	fi
+else
+	ISNEW=false
+fi
 
 #修改机型名
 MODELNAME=`awk -F"=" '{if(/^机型名称/)print $2}' $CONFILE`
 if [ ! -z "$MODELNAME" ];then
 	echo ">>>>>Configurate Model Name = $MODELNAME"
-	sed -i "/^PRODUCT_MODEL/s/=.*/=$MODELNAME/" $PROFILE/elink_ID.mk	
+	sed -i "/^PRODUCT_MODEL/s/=.*/=$MODELNAME/" $PROFILE/elink_ID.mk
 	echo "客户机型:$MODELNAME\n" >> $SRCDIR/修改记录.txt
 else
 	echo "客户机型:$1\n" >> $SRCDIR/修改记录.txt
@@ -504,6 +517,8 @@ if [ ! -z "$APKHANDLE" ];then
 		mkdir -p $BACKUPDIR
 	fi
 
+
+
 	if [ "$APKHANDLE" -eq "1" ];then
 		for i in `ls`
 		do
@@ -769,8 +784,7 @@ if [ $CMD = "y" ];then
 	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
 	./make_user_project.sh $PROJECT $1 new	
 else
-	echo "未完..." >> $SRCDIR/修改记录.txt
-	# sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
+	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
 	exit 1
 fi
 

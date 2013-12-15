@@ -1,13 +1,12 @@
 diff --git a/toolbox/newfs_msdos.c b/toolbox/newfs_msdos.c
-index 07eb02f..95596db 100755
+index 07eb02f..34d41f5 100755
 --- a/toolbox/newfs_msdos.c
 +++ b/toolbox/newfs_msdos.c
-@@ -1228,7 +1228,8 @@ mklabel(u_int8_t *dest, const char *src)
+@@ -1228,7 +1228,7 @@ mklabel(u_int8_t *dest, const char *src)
      int c, i;
  
      for (i = 0; i < 11; i++) {
 -	c = *src ? toupper(*src++) : ' ';
-+	//c = *src ? toupper(*src++) : ' ';
 +	c = *src ? (*src++) : ' ';
  	*dest++ = !i && c == '\xe5' ? 5 : c;
      }
