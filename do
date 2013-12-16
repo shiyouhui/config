@@ -784,7 +784,7 @@ if [ $CMD = "y" ];then
 	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
 	./make_user_project.sh $PROJECT $1 new	
 else
-	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
+	git checkout -- ${CONFILE##*/}
 	exit 1
 fi
 
