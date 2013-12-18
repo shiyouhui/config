@@ -408,7 +408,7 @@ makelogo()
 			convert * xga_$1.bmp
 			cp -p xga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/xga/
 			rm *
-	elif [ $PROJECT = "md601" -o $PROJECT = "md680" ];then
+	elif [ $PROJECT = "md601" -o $PROJECT = "md680" -o $PROJECT = "mr601" ];then
 			convert * cu_qhd_$1.bmp
 			cp -p cu_qhd_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_qhd/
 			rm *
