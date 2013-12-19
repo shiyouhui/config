@@ -396,8 +396,13 @@ makelogo()
 
 	if [ $PROJECT = "md706" -o $PROJECT = "md708" -o $PROJECT = "mr706" ];then
 		if [ $DENSITY = "L" ];then
-			convert * cu_wvga_$1.bmp
-			cp -p cu_wvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_wvga/
+			if [ $PROJECT = "mr706" ];then
+				convert * wvga_$1.bmp
+				cp -p wvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wvga/
+			else	
+				convert * cu_wvga_$1.bmp
+				cp -p cu_wvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_wvga/
+			fi
 			rm *
 		elif [ $DENSITY = "H" ];then  
 			convert * wsvga_$1.bmp
