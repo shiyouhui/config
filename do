@@ -407,9 +407,9 @@ makelogo()
 		done
 	fi
 
-	if [ $PROJECT = "md706" -o $PROJECT = "md708" -o $PROJECT = "mr706" ];then
+	if [ $PROJECT = "md706" -o $PROJECT = "md708" -o $PROJECT = "mr706" -o $PROJECT = "mr650" ];then
 		if [ $DENSITY = "L" ];then
-			if [ $PROJECT = "mr706" ];then
+			if [ $PROJECT = "mr706" -o $PROJECT = "mr650" ];then
 				convert * wvga_$1.bmp
 				cp -p wvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wvga/
 			else	
@@ -422,7 +422,7 @@ makelogo()
 			cp -p wsvga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wsvga/
 			rm *
 		fi
-	elif [ $PROJECT = "md790" -o $PROJECT = "mr790" ];then 
+	elif [ $PROJECT = "md790" -o $PROJECT = "mr790" -o $PROJECT = "mq790" ];then 
 			convert * xga_$1.bmp
 			cp -p xga_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/xga/
 			rm *
@@ -438,6 +438,12 @@ makelogo()
 		elif [ $DENSITY = "H" ];then  
 			convert * wsvganl_$1.bmp
 			cp -p wsvganl_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wsvganl/
+			rm *
+		fi
+	elif [ $PROJECT = "mr970" -o $PROJECT = "mq970" ];then
+		if [ $DENSITY = "L" ];then
+			convert * xganl_$1.bmp
+			cp -p xganl_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/xganl/
 			rm *
 		fi
 	fi
