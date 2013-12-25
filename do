@@ -129,13 +129,16 @@ DISKLABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}
 if [ ! -z "$DISKLABEL" ];then
 	echo ">>>>>Modify disk = $DISKLABEL"
 	cd $SRCDIR/system/core
-	git apply --ignore-whitespace $PATCHDIR/lowcase.patch  
-	cd ../vold
+	
 
 	PRO=`expr substr $PROJECT 1 2`
 	if [ $PRO = "md" ];then
+		git apply --ignore-whitespace $PATCHDIR/lowcase.patch  
+		cd ../vold
 		git  apply --ignore-whitespace $PATCHDIR/parttion_label.patch 
 	elif [ $PRO = "mr" ]; then
+		git apply --ignore-whitespace $PATCHDIR/mr_lowcase.patch  
+		cd ../vold
 		git  apply --ignore-whitespace $PATCHDIR/mr_parttion_label.patch 
 	fi
 
@@ -149,7 +152,15 @@ ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CO
 if [ ! -z "$ONLINELABEL" ];then
 	echo ">>>>>Modify line_label = $ONLINELABEL"
 	cd $SRCDIR/kernel/drivers
-	git apply --ignore-whitespace $PATCHDIR/usbid_label.patch
+
+	PRO=`expr substr $PROJECT 1 2`
+	if [ $PRO = "md" ];then
+		git apply --ignore-whitespace $PATCHDIR/usbid_label.patch
+	elif [ $PRO = "mr" ]; then
+		git apply --ignore-whitespace $PATCHDIR/mr_usbid_label.patch
+	fi
+
+	
 	sed -i "/id display label1/s/\".*\"/\"$ONLINELABEL\"/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
 	sed -i "/id display label2/s/\".*\"/\"$ONLINELABEL\"/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
 	cd $CONFIGDIR

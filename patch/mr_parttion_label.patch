@@ -1,5 +1,5 @@
 diff --git a/Fat.cpp b/Fat.cpp
-index 8a0e1da..bf8d30b 100644
+index 8a0e1da..d9fc0f3 100644
 --- a/Fat.cpp
 +++ b/Fat.cpp
 @@ -530,16 +530,16 @@ int Fat::doMount(const char *fsPath, const char *mountPoint,
@@ -49,7 +49,7 @@ index 8a0e1da..bf8d30b 100644
 +	close(fd);
 +//thh add
 +	 SLOGD("total cluster is %d", ( (unsigned long long)bsize * 512) / (bps * 8));
-+    
++
 +    if (!numSectors && bps && bsize)
 +    {
 +        if ( (((unsigned long long)bsize * 512) / (bps * 8)) > 65536 )
@@ -87,19 +87,19 @@ index 8a0e1da..bf8d30b 100644
 -        args[4] = NULL;
 -        SLOGD("%s %s %s %s", args[0], args[1], args[2], args[3]);
 -        rc = logwrap(5, args, 1);
-+    	/***modify by xiangxiang***/
-+    	 if (isInternalSd){
-+   				args[7] = "-L";
-+   				args[8] = "PF71";       // modify your label here
-+   				args[9] = fsPath;
-+   				args[10] = NULL;
-+   				rc = logwrap(11, args, 1);
-+      	}else{
-+        args[7] = fsPath;
-+        args[8] = NULL;
-+        rc = logwrap(9, args, 1);
-+      }
-+       /****end****/
++/***modify by xiangxiang***/
++   if (isInternalSd){
++       args[7] = "-L";
++       args[8] = "Android";       // display label
++       args[9] = fsPath;
++       args[10] = NULL;
++       rc = logwrap(11, args, 1);
++   }else{
++       args[7] = fsPath;
++       args[8] = NULL;
++       rc = logwrap(9, args, 1);
++   }
++/****end****/
      }
 -    
 -#else
@@ -158,9 +158,20 @@ index 38f98e6..6a9d1b0 100644
  };
  
 diff --git a/Volume.cpp b/Volume.cpp
-index 0fea5dc..369b4c3 100644
+index 0fea5dc..69d213c 100644
 --- a/Volume.cpp
 +++ b/Volume.cpp
+@@ -273,8 +273,8 @@ int Volume::formatVol() {
+     if (mDebug) {
+         SLOGI("Formatting volume %s (%s)", getLabel(), devicePath);
+     }
+-
+-    if (Fat::format(devicePath, 0)) {
++/****modify by xiangxiang****/
++    if (Fat::format(devicePath, 0,IsEmmcStorage())) {
+         SLOGE("Failed to format (%s)", strerror(errno));
+         goto err;
+     }
 @@ -488,7 +488,8 @@ __CHECK_FAT_AGAIN:
  #ifdef MTK_EMMC_SUPPORT
              if ( mVm->isFirstBoot() && IsEmmcStorage()) {
