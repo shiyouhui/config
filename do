@@ -105,7 +105,7 @@ SCREENTIMEOUT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^屏幕延时/)print $2
 if [ ! -z "$SCREENTIMEOUT" ];then
 	echo ">>>>>Configurate screen timeout = $SCREENTIMEOUT"
 	sed -i "/\"def_screen_off_timeout\"/s/>.*</>$SCREENTIMEOUT</" $DEFAULTXML
-	echo "修改屏幕延时:$(`expr $SCREENTIMEOUT \/ 1000`)秒" >> $SRCDIR/修改记录.txt
+	echo "修改屏幕延时:$(expr $SCREENTIMEOUT \/ 1000)秒" >> $SRCDIR/修改记录.txt
 fi
 
 #修改未知来源默认
@@ -152,6 +152,7 @@ if [ ! -z "$ONLINELABEL" ];then
 	git apply --ignore-whitespace $PATCHDIR/usbid_label.patch
 	sed -i "/id display label1/s/\".*\"/\"$ONLINELABEL\"/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
 	sed -i "/id display label2/s/\".*\"/\"$ONLINELABEL\"/" $SRCDIR/kernel/drivers/usb/gadget/f_mass_storage.c
+	cd $CONFIGDIR
 	echo "修改联机ID:$ONLINELABEL" >> $SRCDIR/修改记录.txt
 fi
 
@@ -162,6 +163,7 @@ if [ ! -z "$HOMEPAGE" ];then
 	cd $SRCDIR/packages/apps/Browser
 	git apply --ignore-whitespace $PATCHDIR/homepage.patch
 	sed -i "/default homepage/s/,.*);/,\"$HOMEPAGE\");/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
+	cd $CONFIGDIR
 	echo "修改浏览器主页:$HOMEPAGE" >> $SRCDIR/修改记录.txt
 fi
 
@@ -789,7 +791,7 @@ if [ $CMD = "y" ];then
 	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
 	./make_user_project.sh $PROJECT $1 new	
 else
-	git checkout -- ${CONFILE##*/}
+	git checkout -- config.ini
 	exit 1
 fi
 
