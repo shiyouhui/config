@@ -304,7 +304,7 @@ makeanimation()
 			echo "mv $i $RESULT/part0/${NAME}.$EXTENSION"
 			mv $i $RESULT/part0/${NAME}.$EXTENSION
 			if [ "$EXTENSION" != "png" -a "$EXTENSION" != "PNG" ];then
-				convert $RESULT/part0/${NAME}.$EXTENSION $RESULT/part$k/${NAME}.png
+				convert $RESULT/part0/${NAME}.$EXTENSION $RESULT/part0/${NAME}.png
 				rm $RESULT/part0/${NAME}.$EXTENSION
 			fi
 		done
