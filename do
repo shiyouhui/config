@@ -625,12 +625,16 @@ if [ ! -z "$EXTRAWALLPAPER" ];then
 		cp  wallpaper_extra_"$INDEX"."$EXTENSION" $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
 		cp  wallpaper_extra_"$INDEX"_small.$EXTENSION $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
 		PRO=`expr substr $PROJECT 1 2`
+		MODEL=`expr substr $PROJECT 3 3`
 		if [ $PRO = "md" ];then
 			sed -i "/wallpapers/s/$/\n        <item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values/wallpapers.xml
 		elif [ $PRO = "mr" ]; then
-			sed -i "/wallpapers/s/$/\n        <item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values-sw600dp/wallpapers.xml
+			if [ $MODEL = "706" ];then
+				sed -i "/wallpapers/s/$/\n        <item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values-sw600dp/wallpapers.xml
+			elif [ $MODEL = "790" ];then 
+				sed -i "/wallpapers/s/$/\n        <item>wallpaper_extra_$INDEX<\/item>/" $SRCDIR/packages/apps/Launcher2/res/values-sw720dp/wallpapers.xml
+			fi
 		fi
-		
 		INDEX=`expr $INDEX + 1` 
 	done
 	rm * -r
