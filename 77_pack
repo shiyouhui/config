@@ -36,4 +36,4 @@ cd ../
 if [ ! -e ROM ];then
 	mkdir ROM
 fi
-mv $2 ./ROM/$2
+mv $2 ./ROM/$2 -f

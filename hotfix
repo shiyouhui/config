@@ -1,25 +1,58 @@
 #!/bin/sh
 echo "------->begin"
 
+root=$PWD
 cd alps/system/vold/
 branch=`git branch | awk '{if(match($1,"*")){print $2}}'`
 cd - >/dev/null
 
 echo "------->On branch $branch"
 `repo status >repo.txt` 
-file=`awk  '{if(match($1,"project")){gitdir=$2;}if(match($1,"-")){file=gitdir $2;print file}}' repo.txt`
+project=`awk  '{if(match($1,"project")){print $2}}' repo.txt`
 
-if [ ! -e PATCH/$branch ];then
-	mkdir -p PATCH/$branch 
-fi
-
-for i in $file
+echo ----------------------------------------------------$(date +%Y-%m-%d-%H) begin ------------------------------------------------->>$root/PATCH/$branch/log.txt
+for i in $project
 do
-	target=${i#*/}
-	dir=${target%/*}
-	mkdir -p PATCH/$branch/$dir
-	cp -rfp $i PATCH/$branch/$target
-	echo "out------->PATCH/$branch/$target"
-done
+	cd $i
+	subfiles=`git status -s | awk '{print $NF}'`
+	for j in $subfiles
+	do
+		target=$i$j
+		target=${target#*/}
+		dir=${target%/*}
+		if [ ! -e  $root/PATCH/$branch/$dir ];then
+			mkdir -p $root/PATCH/$branch/$dir
+		fi
 
+		if [ -e  $j ];then
+			cp -rfp $j $root/PATCH/$branch/$target
+			echo "out------->PATCH/$branch/$target"
+		else
+			if [ -e $root/PATCH/$branch/$target ];then
+				rm $root/PATCH/$branch/$target
+				echo "delete------->PATCH/$branch/$target"
+			fi
+		fi
+	done
+	echo -------------------------in project $i >>$root/PATCH/$branch/log.txt
+	git diff >>$root/PATCH/$branch/log.txt
+	cd $root
+done
+echo ----------------------------------------------------$(date +%Y-%m-%d-%H) end ------------------------------------------------->>$root/PATCH/$branch/log.txt
 echo "------->finish"
+echo "自动提交?(y/n)"
+read CMD
+if [ $CMD = "y" ];then
+	echo "备注内容:"
+	read CONTENT
+	for i in $project
+	do
+		cd $i
+		echo "Project $i"
+		git add .
+		git commit -am "$CONTENT"
+		cd $root
+	done
+else
+	exit 1
+fi
