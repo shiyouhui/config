@@ -1,0 +1,25 @@
+#!/bin/sh
+echo "------->begin"
+
+cd alps/system/vold/
+branch=`git branch | awk '{if(match($1,"*")){print $2}}'`
+cd - >/dev/null
+
+echo "------->On branch $branch"
+`repo status >repo.txt` 
+file=`awk  '{if(match($1,"project")){gitdir=$2;}if(match($1,"-")){file=gitdir $2;print file}}' repo.txt`
+
+if [ ! -e PATCH/$branch ];then
+	mkdir -p PATCH/$branch 
+fi
+
+for i in $file
+do
+	target=${i#*/}
+	dir=${target%/*}
+	mkdir -p PATCH/$branch/$dir
+	cp -rfp $i PATCH/$branch/$target
+	echo "out------->PATCH/$branch/$target"
+done
+
+echo "------->finish"

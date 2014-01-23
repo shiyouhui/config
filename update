@@ -1,0 +1,20 @@
+#!/bin/sh
+if [ $# != 1 ];then
+	echo "fatal: usage( ./update mr12|md77|mq89 )"
+	exit 1
+fi
+echo "------->begin update code"
+
+cd alps/system/vold/
+branch=`git branch | awk '{if(match($1,"*")){print $2}}'`
+cd - >/dev/null
+
+repo checkout mtk
+repo sync
+repo abandon elink_sw
+repo forall -c git checkout -b elink_sw $1/elink_sw
+grep "CUSTOM_BUILD_VERNO" alps/mediatek/config/common/ProjectConfig.mk > code_version.txt
+repo checkout $branch
+
+echo UPDATE_TIME = $(date +%Y-%m-%d-%H) >> code_version.txt
+echo "------->update code succesfully!"
