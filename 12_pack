@@ -4,16 +4,16 @@ if [ $# != 2 ];then
 	exit 1
 fi
 
-if [ ! -e out ];then
+if [ ! -e alps/out ];then
 	echo "No out dir!!!"
 	exit 1
 fi	
 
 HOMEDIR=$PWD
-OUTDIR=out/target/product/$1/ 
+OUTDIR=alps/out/target/product/$1/ 
 DESDIR=$2/$2
-Mode_databse1=mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_
-Mode_databse2=mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6582_S00_MOLY_WR8_W1315_MD_WG_MP_V*
+Mode_databse1=alps/mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_
+Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6582_S00_MOLY_WR8_W1315_MD_WG_MP_V*
 DATABASEDIR=$DESDIR/databases
 mkdir -p $DATABASEDIR
 cp $Mode_databse1 $DATABASEDIR
@@ -26,15 +26,14 @@ do
 	cp $i $HOMEDIR/$DESDIR
 	echo "cp $i "
 done
-cp  *.zip $HOMEDIR/$2
 cd $HOMEDIR/$DESDIR
-echo "================>>beginta"
+echo "================>>begin compressing"
 cd ..
 tar czvfh $2.tar.gz $2
-echo "================>>tar OK!"
+echo "================>>Compressed OK!"
 rm $2 -r
-cd ../../
+cd ../
 if [ ! -e ROM ];then
 	mkdir ROM
 fi
-mv alps/$2 ./ROM/$2
+mv $2 ./ROM/$2

@@ -826,7 +826,7 @@ if [ $CMD = "y" ];then
 else
 	cd $CONFIGDIR
 	echo "===============================>>out $RECORDFILE"
-	#git checkout -- config.ini
+	git checkout -- config.ini
 	exit 1
 fi
 
