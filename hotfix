@@ -10,7 +10,10 @@ echo "------->On branch $branch"
 `repo status >repo.txt` 
 project=`awk  '{if(match($1,"project")){print $2}}' repo.txt`
 if [ ! -z "$project" ];then
-	echo ----------------------------------------------------$(date +%Y-%m-%d-%H) begin ------------------------------------------------->>$root/PATCH/$branch/log.txt
+	if [ ! -e $root/PATCH/$branch ];then
+		mkdir -p $root/PATCH/$branch
+	fi
+	
 	for i in $project
 	do
 		cd $i
@@ -34,25 +37,27 @@ if [ ! -z "$project" ];then
 				fi
 			fi
 		done
-		echo -------------------------in project $i >>$root/PATCH/$branch/log.txt
-		git diff >>$root/PATCH/$branch/log.txt
+		
 		cd $root
 	done
-	echo ----------------------------------------------------$(date +%Y-%m-%d-%H) end ------------------------------------------------->>$root/PATCH/$branch/log.txt
 	echo "------->finish"
 	echo "自动提交?(y/n)"
 	read CMD
-	if [ $CMD = "y" ];then
+	if [ "$CMD" = "y" ];then
 		echo "备注内容:"
 		read CONTENT
+		echo ----------------------------------------------------$(date +%Y-%m-%d-%H) begin ------------------------------------------------->>$root/PATCH/$branch/log.txt
 		for i in $project
 		do
 			cd $i
 			echo "Project $i"
+			echo -------------------------in project $i >>$root/PATCH/$branch/log.txt
+			git diff >>$root/PATCH/$branch/log.txt
 			git add .
 			git commit -am "$CONTENT"
 			cd $root
 		done
+		echo ----------------------------------------------------$(date +%Y-%m-%d-%H) end ------------------------------------------------->>$root/PATCH/$branch/log.txt
 	else
 		exit 1
 	fi
