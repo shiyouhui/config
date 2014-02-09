@@ -815,18 +815,18 @@ if [ ! -z "$EXTRANOTIFICATION" ]; then
 	rm $EXTRANOTIFICATIONDIR/*
 fi
 
-echo "Begin to build your project?(y/n)"
-read CMD
-if [ $CMD = "y" ];then
-	cd $SRCDIR
-	echo "Build finish $(date +%Y-%m-%d %H:%M:%S)" >> $RECORDFILE
-	echo "===============================>>out $RECORDFILE"
-	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
-	./make_user_project.sh $PROJECT $1 new	
-else
+# echo "Begin to build your project?(y/n)"
+# read CMD
+# if [ $CMD = "y" ];then
+# 	cd $SRCDIR
+# 	echo "Build finish $(date +%Y-%m-%d %H:%M:%S)" >> $RECORDFILE
+# 	echo "===============================>>out $RECORDFILE"
+# 	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
+# 	./make_user_project.sh $PROJECT $1 new	
+# else
 	cd $CONFIGDIR
 	echo "===============================>>out $RECORDFILE"
 	git checkout -- config.ini
-	exit 1
-fi
+# exit 1
+# fi
 
