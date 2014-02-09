@@ -327,6 +327,7 @@ makeanimation()
 		done
 		mkdir -p $RESULT/part1
 		cp $RESULT/part0/${NAME}.* $RESULT/part1/
+		echo "mv $RESULT/part0/${NAME}.png $RESULT/part1/"
 	else
 		for i in ${FILES}
 		do 
@@ -348,9 +349,9 @@ makeanimation()
 		done
 	fi
 
-	if [ $k = "0" ];then
-		mkdir -p $RESULT/part1
-	fi
+	# if [ $k = "0" ];then
+	# 	mkdir -p $RESULT/part1
+	# fi
 
 	cd $RESULT
 
