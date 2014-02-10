@@ -13,6 +13,12 @@ repo checkout mtk
 repo sync
 repo abandon elink_sw
 repo forall -c git checkout -b elink_sw $1/elink_sw
+file1=`ls  alps/mediatek/config/common/make_user_project.sh -l | awk '{print $6}'`
+file2=`ls  alps/make_user_project.sh -l | awk '{print $6}'`
+if [ $file1 != $file2 ];then
+	cp  alps/mediatek/config/common/make_user_project.sh alps/ 
+	echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>build script had updated!!!!!!"
+fi
 grep "CUSTOM_BUILD_VERNO" alps/mediatek/config/common/ProjectConfig.mk > code_version.txt
 repo checkout $branch
 
