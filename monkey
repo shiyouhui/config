@@ -444,7 +444,7 @@ makelogo()
 	elif [ $PROJECT = "md601" -o $PROJECT = "md680" -o $PROJECT = "mr601" ];then
 			convert * cu_qhd_$1.bmp
 			cp -p cu_qhd_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/cu_qhd/
-	elif [ $PROJECT = "md900" -o $PROJECT = "md100" ];then
+	elif [ $PROJECT = "md900" -o $PROJECT = "md100" -o $PROJECT = "mr900" -o $PROJECT = "mr100" ];then
 		if [ $DENSITY = "L" ];then
 			convert * wvgalnl_$1.bmp
 			cp -p wvgalnl_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/wvgalnl/
