@@ -394,8 +394,8 @@ fi
 #制作开机logo
 UBOOTLOGODIR=$CONFIGDIR/custom/第一屏
 KERNELLOGODIR=$CONFIGDIR/custom/第二屏
-UBOOTLOGO=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^第一屏/)print $2}' $CONFILE`
-KERNELLOGO=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^第二屏/)print $2}' $CONFILE`
+HASUBOOTLOGO=`ls $CONFIGDIR/custom/第一屏 | wc -l `
+HASKERNELLOGO=`ls $CONFIGDIR/custom/第二屏 | wc -l `
 makelogo()
 {
 	if [ $1 = "uboot" ];then
@@ -464,21 +464,23 @@ makelogo()
 }
 ###################################################################################################################################################################################################
 #开机第一屏logo
-if [ ! -z "$UBOOTLOGO" ];then
+if [ "$HASUBOOTLOGO" -gt 0 ];then
 	makelogo uboot
 	echo "修改logo1" >> $RECORDFILE
 fi
+
+
 ###################################################################################################################################################################################################
 #开机第二屏logo
-if [ ! -z "$KERNELLOGO" ];then
+if [ "$HASKERNELLOGO" -gt 0  ];then
 	makelogo kernel
 	echo "修改logo2" >> $RECORDFILE
 fi
 ###################################################################################################################################################################################################
 #修改默认壁纸
-WALLPAPER=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认桌面壁纸/)print $2}' $CONFILE`
+HASWALLPAPER=`ls $CONFIGDIR/custom/默认桌面壁纸 | wc -l `
 WALLPAPERDIR=$CONFIGDIR/custom/默认桌面壁纸
-if [ ! -z "$WALLPAPER" ];then
+if [ "$HASWALLPAPER" -gt 0  ];then
 	echo ">>>>>Change default wallpaper!!"
 	cd $WALLPAPERDIR
 
@@ -602,9 +604,9 @@ if [ ! -z "$APKHANDLE" ];then
 fi
 ###################################################################################################################################################################################################
 #添加壁纸
-EXTRAWALLPAPER=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^备选壁纸/)print $2}' $CONFILE`
+HASEXTRAWALLPAPER=`ls $CONFIGDIR/custom/备选壁纸 | wc -l `
 EXTRAWALLPAPERDIR=$CONFIGDIR/custom/备选壁纸
-if [ ! -z "$EXTRAWALLPAPER" ];then
+if [ "$HASEXTRAWALLPAPER" -gt 0 ];then
 	echo ">>>>>begin copy extra wallpaper!!"
 	cd $EXTRAWALLPAPERDIR
 	FILES=`ls`
@@ -673,9 +675,9 @@ if [ ! -z "$OPENROOT" ]; then
 fi
 ###################################################################################################################################################################################################
 #默认来电铃声
-DEFAULTRINGTONE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认来电铃声/)print $2}' $CONFILE`
+HASDEFAULTRINGTONE=`ls $CONFIGDIR/custom/默认来电铃声 | wc -l `
 DEFAULTRINGTONEDIR=$CONFIGDIR/custom/默认来电铃声
-if [ ! -z "$DEFAULTRINGTONE" ]; then
+if [ "$HASDEFAULTRINGTONE" -gt 0 ]; then
 	echo ">>>>>Change default ringtone!!"
 	cd $DEFAULTRINGTONEDIR
 
@@ -709,9 +711,9 @@ if [ ! -z "$DEFAULTRINGTONE" ]; then
 fi
 ###################################################################################################################################################################################################
 #备选来电铃声
-EXTRARINGTONE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^备选来电铃声/)print $2}' $CONFILE`
+HASEXTRARINGTONE=`ls $CONFIGDIR/custom/备选来电铃声 | wc -l `
 EXTRARINGTONEDIR=$CONFIGDIR/custom/备选来电铃声
-if [ ! -z "$EXTRARINGTONE" ]; then
+if [ "$HASEXTRARINGTONE" -gt 0 ]; then
 	echo ">>>>>Add extra ringtone!!"
 	cd $EXTRARINGTONEDIR
 
@@ -745,9 +747,9 @@ if [ ! -z "$EXTRARINGTONE" ]; then
 fi
 ###################################################################################################################################################################################################
 #默认通知铃声
-DEFAULNOTIFICATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认通知铃声/)print $2}' $CONFILE`
+HASDEFAULNOTIFICATIONE=`ls $CONFIGDIR/custom/默认通知铃声 | wc -l `
 DEFAULNOTIFICATIONDIR=$CONFIGDIR/custom/默认通知铃声
-if [ ! -z "$DEFAULNOTIFICATION" ]; then
+if [ "$HASDEFAULNOTIFICATIONE" -gt 0 ]; then
 	echo ">>>>>Change default notifications!!"
 	cd $DEFAULNOTIFICATIONDIR
 
@@ -781,9 +783,9 @@ if [ ! -z "$DEFAULNOTIFICATION" ]; then
 fi
 ###################################################################################################################################################################################################
 #备选通知铃声
-EXTRANOTIFICATION=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^备选通知铃声/)print $2}' $CONFILE`
+HASEXTRANOTIFICATION=`ls $CONFIGDIR/custom/备选通知铃声 | wc -l `
 EXTRANOTIFICATIONDIR=$CONFIGDIR/custom/备选通知铃声
-if [ ! -z "$EXTRANOTIFICATION" ]; then
+if [ "$HASEXTRANOTIFICATION" -gt 0 ]; then
 	echo ">>>>>Add extra notifications!!"
 	cd $EXTRANOTIFICATIONDIR
 
