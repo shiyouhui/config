@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ###################################################################################################################################################################################################
 if [ $# != 1 ];then
 	echo "fatal: usage( ./do MR7063HC8W1 )"
@@ -17,6 +17,9 @@ CONFIGDIR=~/config
 SRCDIR=$PWD/alps
 CONFILE=$CONFIGDIR/config.ini
 PATCHDIR=$CONFIGDIR/patch
+OK='\e[0;32m'
+ERROR='\e[1;31m'
+END='\e[0m'
 
 cd $SRCDIR/system/vold/
 BRANCH=`git branch | awk '{if(match($1,"*")){print $2}}'`
@@ -32,6 +35,16 @@ CUSTOMCONF=$SRCDIR/mediatek/config/common/custom.conf
 DEFAULTXML=$SRCDIR/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
 BULIDFILE=$SRCDIR/build/target/product/core.mk
 SOUNDSDIR=$SRCDIR/frameworks/base/data/sounds
+
+ERROR()
+{
+	echo -e  "${ERROR} $1 ${END}"
+}
+
+OK()
+{
+	echo -e  "${OK} $1 ${END}"
+}
 
 ###################################################################################################################################################################################################
 #生成修改记录
@@ -64,7 +77,7 @@ echo "编译机型:$1\n" >> $RECORDFILE
 #修改机型名
 MODELNAME=`awk -F"=" '{if(/^机型名称/)print $2}' $CONFILE`
 if [ ! -z "$MODELNAME" ];then
-	echo ">>>>>Configurate Model Name = $MODELNAME"
+	OK ">>>>>Configurate Model Name = $MODELNAME"
 	sed -i "/^PRODUCT_MODEL/s/=.*/=$MODELNAME/" $PROFILE/elink_ID.mk
 	echo "修改机型名:$MODELNAME\n" >> $RECORDFILE
 fi
@@ -72,7 +85,7 @@ fi
 #修改蓝牙名称
 BLUETOOTHNAME=`awk -F"=" '{if(/^蓝牙名称/)print $2}' $CONFILE`
 if [ ! -z "$BLUETOOTHNAME" ];then
-	echo ">>>>>Configurate Bluetooth Name = $BLUETOOTHNAME "
+	OK ">>>>>Configurate Bluetooth Name = $BLUETOOTHNAME "
 	sed -i "/^bluetooth/s/=.*/=$BLUETOOTHNAME/" $CUSTOMCONF
 	echo "修改蓝牙名称:$BLUETOOTHNAME" >> $RECORDFILE
 fi
@@ -80,7 +93,7 @@ fi
 #修改Wifi共享热点SSID
 WLANSSID=`awk -F"=" '{if(/^共享SSID名称/)print $2}' $CONFILE`
 if [ ! -z "$WLANSSID" ];then
-	echo ">>>>>Configurate WLAN_SSID Display Label = $WLANSSID"
+	OK " >>>>>Configurate WLAN_SSID Display Label = $WLANSSID "
 	sed -i "/^wlan.SSID/s/=.*/=$WLANSSID/" $CUSTOMCONF
 	echo "修改Wifi共享热点SSID:$WLANSSID" >> $RECORDFILE
 fi
@@ -88,7 +101,7 @@ fi
 #修改编译版本
 BUILDVERSION=`awk -F"=" '{if(/^编译版本/)print $2}' $CONFILE`
 if [ ! -z "$BUILDVERSION" ];then
-	echo ">>>>>Configurate Build version = $BUILDVERSION"
+	OK " >>>>>Configurate Build version = $BUILDVERSION  "
 	sed -i "/^ELINK_VERSION/s/=.*/=$BUILDVERSION/" $PROFILE/elink_ID.mk
 	echo "修改编译版本:$BUILDVERSION" >> $RECORDFILE
 fi
@@ -96,7 +109,7 @@ fi
 #修改自定义编译版本
 CUSTOMBUILDVERSION=`awk -F"=" '{if(/^自定义编译版本/)print $2}' $CONFILE`
 if [ ! -z "$CUSTOMBUILDVERSION" ];then
-	echo ">>>>>Configurate Customer build version = $CUSTOMBUILDVERSION"
+	OK " >>>>>Configurate Customer build version = $CUSTOMBUILDVERSION  "
 	sed -i "/^CUSTOM_BUILD_VERNO/s/=.*/=$CUSTOMBUILDVERSION/" $SRCDIR/mediatek/config/common/ProjectConfig.mk
 	echo "修改自定义编译版本:$CUSTOMBUILDVERSION" >> $RECORDFILE
 fi
@@ -104,7 +117,7 @@ fi
 #修改时区
 TIMEZONE=`awk -F"=" 'gsub(/\//,"\\\/"){if(/^时区/)print $2}' $CONFILE`
 if [ ! -z "$TIMEZONE" ];then
-	echo ">>>>>Configurate Timezone = $TIMEZONE"
+	OK " >>>>>Configurate Timezone = $TIMEZONE  "
 	sed -i "/^persist.sys.timezone/s/=.*/=$TIMEZONE/" $PROFILE/system.prop
 	echo "修改时区:"`awk -F"=" '{if(/^时区/)print $2}' $CONFILE` >> $RECORDFILE
 fi
@@ -112,7 +125,7 @@ fi
 #修改默认亮度
 BRIGHTNESS=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认亮度/)print $2}' $CONFILE`
 if [ ! -z "$BRIGHTNESS" ];then
-	echo ">>>>>Configurate Screen brightness = $BRIGHTNESS"
+	OK " >>>>>Configurate Screen brightness = $BRIGHTNESS  "
 	sed -i "/\"def_screen_brightness\"/s/>.*</>$BRIGHTNESS</" $DEFAULTXML
 	echo "修改默认亮度:$BRIGHTNESS" >> $RECORDFILE
 fi
@@ -120,7 +133,7 @@ fi
 #修改屏幕延时
 SCREENTIMEOUT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^屏幕延时/)print $2}' $CONFILE`
 if [ ! -z "$SCREENTIMEOUT" ];then
-	echo ">>>>>Configurate screen timeout = $SCREENTIMEOUT"
+	OK " >>>>>Configurate screen timeout = $SCREENTIMEOUT  "
 	sed -i "/\"def_screen_off_timeout\"/s/>.*</>$SCREENTIMEOUT</" $DEFAULTXML
 	echo "修改屏幕延时:$(expr $SCREENTIMEOUT \/ 1000)秒" >> $RECORDFILE
 fi
@@ -128,7 +141,7 @@ fi
 #修改未知来源默认
 UNKNOWSRC=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^未知来源/)print $2}' $CONFILE`
 if [ ! -z "$UNKNOWSRC" ];then
-	echo ">>>>>Unkownsource selected = $UNKNOWSRC"
+	OK " >>>>>Unkownsource selected = $UNKNOWSRC"
 	sed -i "/\"def_install_non_market_apps\"/s/>.*</>$UNKNOWSRC</" $DEFAULTXML
 	echo "默认打开未知来源选项" >> $RECORDFILE
 fi
@@ -136,7 +149,7 @@ fi
 #修改默认输入法
 INPUTMETHOD=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认输入法/)print $2}' $CONFILE`
 if [ ! -z "$INPUTMETHOD" ];then
-	echo ">>>>>Modify default input_method = $INPUTMETHOD"
+	OK " >>>>>Modify default input_method = $INPUTMETHOD  "
 	sed -i "/^DEFAULT_INPUT_METHOD/s/=.*/=$INPUTMETHOD/" $PROFILE/ProjectConfig.mk
 	echo "修改默认输入法:$INPUTMETHOD" >> $RECORDFILE
 fi
@@ -144,7 +157,7 @@ fi
 #修改可移动磁盘名
 DISKLABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^可移动磁盘/)print $2}' $CONFILE`
 if [ ! -z "$DISKLABEL" ];then
-	echo ">>>>>Modify disk = $DISKLABEL"
+	OK " >>>>>Modify disk = $DISKLABEL "
 	cd $SRCDIR/system/core
 	
 
@@ -167,7 +180,7 @@ fi
 #修改联机ID
 ONLINELABEL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^联机ID/)print $2}' $CONFILE`
 if [ ! -z "$ONLINELABEL" ];then
-	echo ">>>>>Modify line_label = $ONLINELABEL"
+	OK " >>>>>Modify online_id = $ONLINELABEL "
 	cd $SRCDIR/kernel/drivers
 
 	PRO=`expr substr $PROJECT 1 2`
@@ -187,7 +200,7 @@ fi
 #修改浏览器主页
 HOMEPAGE=`awk -F"=" 'gsub(/\//,"\\\/")sub(/^[[:blank:]]*/,"",$2){if(/^浏览器主页/)print $2}' $CONFILE`
 if [ ! -z "$HOMEPAGE" ];then
-	echo ">>>>>Modify default Browse Homepage = `expr substr $HOMEPAGE 10 20`"
+	OK " >>>>>Modify default Browse Homepage = `expr substr $HOMEPAGE 10 20` "
 	cd $SRCDIR/packages/apps/Browser
 	git apply --ignore-whitespace $PATCHDIR/homepage.patch
 	sed -i "/default homepage/s/,.*);/,\"$HOMEPAGE\");/" $SRCDIR/packages/apps/Browser/src/com/android/browser/BrowserSettings.java
@@ -195,7 +208,7 @@ if [ ! -z "$HOMEPAGE" ];then
 	echo "修改浏览器主页:$HOMEPAGE" >> $RECORDFILE
 fi
 ###################################################################################################################################################################################################
-#修改前摄像头插值
+# MD77修改前摄像头插值
 SUBCAMERA=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^前摄像头插值/)print $2}' $CONFILE`
 if  [ ! -z "$SUBCAMERA" ];then
 	if [ "$SUBCAMERA" = "30" ];then
@@ -216,7 +229,7 @@ if  [ ! -z "$SUBCAMERA" ];then
 	echo "修改前摄像头插值:$SUBCAMERA" >> $RECORDFILE
 fi
 ###################################################################################################################################################################################################
-#修改后摄像头插值
+# MD77修改后摄像头插值
 MAINCAMERA=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^后摄像头插值/)print $2}' $CONFILE`
 if  [ ! -z "$MAINCAMERA" ];then
 	if [ "$MAINCAMERA" = "30" ];then
@@ -257,7 +270,7 @@ if [ ! -z "$ACTIVEPROFILE" ];then
 		echo "情景模式输入错误，请按可供选择输入(标准，静音，会议，户外)"
 	fi
 
-	echo ">>>>>Modify line_label = $ACTIVEPROFILE"
+	OK " >>>>>Modify Audio profile = $ACTIVEPROFILE  "
 	sed -i "/\"def_active_profile\"/s/>.*</>$RESULT</" $SRCDIR/frameworks/base/packages/SettingsProvider/res/values/mtk_defaults.xml
 	echo "修改默认情景模式:$ACTIVEPROFILE" >> $RECORDFILE
 fi
@@ -274,12 +287,12 @@ SHUTTIMES=`echo $SHUTANIMATION | awk '{print $2}'`
 makeanimation()
 {
 	if [ $1 = "boot" ];then
-		echo ">>>>>begin to make bootanimation"
+		OK " >>>>>begin to make bootanimation "
 		cd $BOOTANIMATIONDIR
 		RESULT=bootanimation
 		TIMES=$BOOTTIMES
 	elif [ $1 = "shut" ];then
-		echo ">>>>>begin to make shutanimation"
+		OK " >>>>>begin to make shutanimation "
 		cd $SHUTANIMATIONDIR
 		RESULT=shutanimation
 		TIMES=$SHUTTIMES
@@ -289,18 +302,18 @@ makeanimation()
 	NF=`ls -l | grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
-		echo "no animation source picture!!!"
+		OK "${ERROR} no animation source picture!!! "
 		return
 	fi
 
 	if [  $NF -ne $FNF ];then	
-		echo "Rename because any filename has blank!!!"
+		OK " Rename because any filename has blank!!! "
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			if [ "$f" != "$TARGET" ];then
 				mv "$f" "$TARGET"
-				echo mv "$f" "$TARGET"
+				OK " mv "$f" "$TARGET" "
 			fi
 		done
 	fi
@@ -318,7 +331,7 @@ makeanimation()
 		do 
 			INDEX=`expr $INDEX + 1` 
 			NAME=`printf "%04d\n" ${INDEX}`
-			echo "mv $i $RESULT/part0/${NAME}.$EXTENSION"
+			OK " mv $i $RESULT/part0/${NAME}.$EXTENSION "
 			mv $i $RESULT/part0/${NAME}.$EXTENSION
 			if [ "$EXTENSION" != "png" -a "$EXTENSION" != "PNG" ];then
 				convert $RESULT/part0/${NAME}.$EXTENSION $RESULT/part0/${NAME}.png
@@ -327,7 +340,7 @@ makeanimation()
 		done
 		mkdir -p $RESULT/part1
 		cp $RESULT/part0/${NAME}.* $RESULT/part1/
-		echo "mv $RESULT/part0/${NAME}.png $RESULT/part1/"
+		OK " mv $RESULT/part0/${NAME}.png $RESULT/part1/ "
 	else
 		for i in ${FILES}
 		do 
@@ -339,7 +352,7 @@ makeanimation()
 				mkdir -p $RESULT/part$k
 			fi
 			NAME=`printf "%04d\n" ${INDEX}`
-			echo "mv $i $RESULT/part$k/${NAME}.$EXTENSION"
+			OK " mv $i $RESULT/part$k/${NAME}.$EXTENSION "
 			mv $i $RESULT/part$k/${NAME}.$EXTENSION
 	
 			if [ "$EXTENSION" != "png" -a "$EXTENSION" != "PNG" ];then
@@ -349,9 +362,6 @@ makeanimation()
 		done
 	fi
 
-	# if [ $k = "0" ];then
-	# 	mkdir -p $RESULT/part1
-	# fi
 
 	cd $RESULT
 
@@ -375,7 +385,7 @@ makeanimation()
 	fi
 	cp $RESULT.zip $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/media/
 	rm ../* -r
-	echo "make $RESULT successfully ===========> OK"
+	OK " make $RESULT successfully ===========> OK "
 	cd $CONFIGDIR
 }
 ###################################################################################################################################################################################################
@@ -399,28 +409,25 @@ HASKERNELLOGO=`ls $CONFIGDIR/custom/第二屏 | wc -l `
 makelogo()
 {
 	if [ $1 = "uboot" ];then
-		echo ">>>>>begin to make uboot logo"
+		OK " >>>>>begin to make uboot logo "
 		cd $UBOOTLOGODIR
 	elif [ $1 = "kernel" ];then
-		echo ">>>>>begin to make kernel logo"
+		OK " >>>>>begin to make kernel logo "
 		cd $KERNELLOGODIR
 	fi
 
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
-	if [ -z "$FILES" ];then
-		echo "no logo source picture!!!"
-		return
-	fi
+	
 	if [  $NF -ne $FNF ];then	
-		echo "Rename because any filename has blank!!!"
+		OK " Rename because any filename has blank!!! "
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			if [ "$f" != "$TARGET" ];then
 				mv "$f" "$TARGET"
-				echo mv 	"$f" "$TARGET"
+				OK " mv 	"$f" "$TARGET" "
 			fi
 		done
 	fi
@@ -459,7 +466,7 @@ makelogo()
 		fi
 	fi
 	rm *
-	echo "make $1 logo  successfully ===========> OK"
+	OK " make $1 logo  successfully ===========> OK "
 	cd $CONFIGDIR
 }
 ###################################################################################################################################################################################################
@@ -481,24 +488,21 @@ fi
 HASWALLPAPER=`ls $CONFIGDIR/custom/默认桌面壁纸 | wc -l `
 WALLPAPERDIR=$CONFIGDIR/custom/默认桌面壁纸
 if [ "$HASWALLPAPER" -gt 0  ];then
-	echo ">>>>>Change default wallpaper!!"
+	OK " >>>>>Change default wallpaper!! "
 	cd $WALLPAPERDIR
 
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
-	if [ -z "$FILES" ];then
-		echo "no default wallpaper source picture!!!"
-		return
-	fi
+	
 	if [  $NF -ne $FNF ];then	
-		echo "Rename because any filename has blank!!!"
+		OK " Rename because any filename has blank!!! "
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			if [ "$f" != "$TARGET" ];then
 					mv "$f" "$TARGET"
-					echo mv "$f" "$TARGET"
+					OK " mv "$f" "$TARGET" "
 			fi
 		done
 	fi
@@ -511,7 +515,7 @@ if [ "$HASWALLPAPER" -gt 0  ];then
 	fi
 	
 	rm * -r
-	echo "Change default  wallpaper  successfully ===========> OK"
+	OK " Change default  wallpaper  successfully ===========> OK "
 	cd $SRCDIR
 	echo "修改默认壁纸" >> $RECORDFILE
 fi
@@ -523,24 +527,24 @@ DATAAPPDIR=$SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJEC
 SYSTEMAPPDIR=$SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/app
 BACKUPDIR=$SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/system/appbackup
 if [ ! -z "$APKHANDLE" ];then
-	echo ">>>>>begin copy customer apk to android soruce!!"
+	OK " >>>>>begin copy customer apk to android soruce!! "
 	cd $APKDIR
 
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
 	if [ -z "$FILES" ];then
-		echo "NO apk file!!!"
+		OK "${ERROR} NO apk file!!! "
 		return
 	fi
 	if [  $NF -ne $FNF ];then	
-		echo "Rename because any filename has blank!!!"
+		OK " Rename because any filename has blank!!! "
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
 			if [ "$f" != "$TARGET" ];then
 				mv "$f" "$TARGET"
-				echo mv "$f" "$TARGET"
+				OK " mv "$f" "$TARGET" "
 			fi
 		done
 	fi
@@ -560,9 +564,9 @@ if [ ! -z "$APKHANDLE" ];then
 	if [ "$APKHANDLE" -eq "1" ];then
 		for i in `ls`
 		do
-			echo "copy $i to app"
+			OK " copy $i to app "
 			cp -p $i $DATAAPPDIR
-			echo "copy $i to appbackup"
+			OK " copy $i to appbackup "
 			cp -p $i $BACKUPDIR
 			echo "/data/app/$i" >> $DATAAPPDIR/.keep_list
 			echo "/system/appbackup/$i" >> $SYSTEMAPPDIR/.restore_list
@@ -574,7 +578,7 @@ if [ ! -z "$APKHANDLE" ];then
 	elif [ "$APKHANDLE" -eq "2" ];then
 		for i in `ls`
 		do
-			echo "copy $i to system_app"
+			OK " copy $i to system_app "
 			APKNAME=${i%\.*}
 			mkdir -p  $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME
 			cp -p $i $SRCDIR/vendor/common/SYSTEM_APP/$APKNAME/
@@ -589,7 +593,7 @@ if [ ! -z "$APKHANDLE" ];then
 		echo "copy $i to app"
 		for i in `ls`
 		do
-			echo "copy $i to app"
+			OK " copy $i to app "
 			cp -p $i $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/
 			echo "/data/app/$i" >> $SRCDIR/vendor/mediatek/$PROJECT/artifacts/out/target/product/$PROJECT/data/app/.keep_list
 		done
@@ -597,7 +601,7 @@ if [ ! -z "$APKHANDLE" ];then
 		cd $CONFIGDIR
 		echo "预置APK(可卸载不可恢复)" >> $RECORDFILE
 	else
-		echo "ERROE:error apk handle!!!!"
+		OK "${ERROE} ERROE:error apk handle!!!! "
 		return
 	fi
 
@@ -607,17 +611,15 @@ fi
 HASEXTRAWALLPAPER=`ls $CONFIGDIR/custom/备选壁纸 | wc -l `
 EXTRAWALLPAPERDIR=$CONFIGDIR/custom/备选壁纸
 if [ "$HASEXTRAWALLPAPER" -gt 0 ];then
-	echo ">>>>>begin copy extra wallpaper!!"
+	OK " >>>>>begin copy extra wallpaper!! "
 	cd $EXTRAWALLPAPERDIR
+
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
-	if [ -z "$FILES" ];then
-		echo "no extra wallpaper picture!!!"
-		return
-	fi
+	
 	if [  $NF -ne $FNF ];then	
-		echo "Rename because any filename has blank!!!"
+		OK " Rename because any filename has blank!!! "
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr -d ' '`
@@ -634,7 +636,7 @@ if [ "$HASEXTRAWALLPAPER" -gt 0 ];then
 	for f in `ls ./ | tr " " "\?"`
 	do
 		mv "$f" wallpaper_extra_$INDEX.$EXTENSION
-		echo mv "$f" wallpaper_extra_$INDEX.$EXTENSION
+		echo  -e " mv "$f" wallpaper_extra_$INDEX.$EXTENSION "
 		convert -resize 213x189 wallpaper_extra_"$INDEX"."$EXTENSION" wallpaper_extra_"$INDEX"_small.$EXTENSION
 		cp  wallpaper_extra_"$INDEX"."$EXTENSION" $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
 		cp  wallpaper_extra_"$INDEX"_small.$EXTENSION $SRCDIR/packages/apps/Launcher2/res/drawable-nodpi/
@@ -659,7 +661,7 @@ fi
 #默认语言
 LANGUAGE=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^默认语言/)print $2}' $CONFILE`
 if [ ! -z "$LANGUAGE" ];then
-	echo ">>>>>default Language = $LANGUAGE"
+	OK " >>>>>default Language = $LANGUAGE "
 	sed -i "/DEFAULT_LATIN_IME_LANGUAGES/s/=.*/=$LANGUAGE/" $PROFILE/ProjectConfig.mk
 	sed -i "/MTK_PRODUCT_LOCALES/s/$LANGUAGE//" $PROFILE/ProjectConfig.mk
 	sed -i "/MTK_PRODUCT_LOCALES/s/=/=$LANGUAGE /" $PROFILE/ProjectConfig.mk
@@ -669,7 +671,7 @@ fi
 #开启ROOT权限
 OPENROOT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^开启ROOT权限/)print $2}' $CONFILE`
 if [ ! -z "$OPENROOT" ]; then
-	echo ">>>>>Open root permission"
+	OK " >>>>>Open root permission "
 	sed -i "/^EK_ROOT_SUPPORT/s/=.*/=$OPENROOT/" $COMMONPROFILE/ProjectConfig.mk
 	echo "开启ROOT权限" >> $RECORDFILE
 fi
@@ -678,16 +680,13 @@ fi
 HASDEFAULTRINGTONE=`ls $CONFIGDIR/custom/默认来电铃声 | wc -l `
 DEFAULTRINGTONEDIR=$CONFIGDIR/custom/默认来电铃声
 if [ "$HASDEFAULTRINGTONE" -gt 0 ]; then
-	echo ">>>>>Change default ringtone!!"
+	OK " >>>>>Change default ringtone!! "
 	cd $DEFAULTRINGTONEDIR
 
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
-	if [ -z "$FILES" ];then
-		echo "no default ringtone source file!!!"
-		return
-	fi
+	
 	if [  $NF -ne $FNF ];then	
 		echo "Rename because any filename has blank!!!"
 		for f in `ls ./ | tr " " "\?"`
@@ -695,7 +694,7 @@ if [ "$HASDEFAULTRINGTONE" -gt 0 ]; then
 			TARGET=`echo "$f" | tr " " "_"`
 			if [ "$f" != "$TARGET" ];then
 				mv "$f" "$TARGET"
-				echo mv "$f" "$TARGET"
+				OK " mv "$f" "$TARGET" "
 			fi
 		done
 	fi
@@ -706,7 +705,7 @@ if [ "$HASDEFAULTRINGTONE" -gt 0 ]; then
 		sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/ringtones/'$RINGFILE':system/media/audio/ringtones/'$RINGFILE' \\' $SOUNDSDIR/AudioPackage2.mk
 		rm $DEFAULTRINGTONEDIR/$RINGFILE
 	else
-		echo "ERROR More than one audio file."
+		echo  -e "${ERROR}  More than one audio file. "
 	fi
 fi
 ###################################################################################################################################################################################################
@@ -714,24 +713,21 @@ fi
 HASEXTRARINGTONE=`ls $CONFIGDIR/custom/备选来电铃声 | wc -l `
 EXTRARINGTONEDIR=$CONFIGDIR/custom/备选来电铃声
 if [ "$HASEXTRARINGTONE" -gt 0 ]; then
-	echo ">>>>>Add extra ringtone!!"
+	OK " >>>>>Add extra ringtone!! "
 	cd $EXTRARINGTONEDIR
 
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
-	if [ -z "$FILES" ];then
-		echo "no extra ringtone source file!!!"
-		return
-	fi
+	
 	if [  $NF -ne $FNF ];then	
-		echo "Rename because any filename has blank!!!"
+		echo  -e " Rename because any filename has blank!!! "
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr " " "_"`
 			if [ "$f" != "$TARGET" ];then
 				mv "$f" "$TARGET"
-				echo mv "$f" "$TARGET"
+				OK "  mv "$f" "$TARGET" "
 				cp $EXTRARINGTONEDIR/$f $SOUNDSDIR/ringtones
 				sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/ringtones/'$f':system/media/audio/ringtones/'$f' \\' $SOUNDSDIR/AudioPackage2.mk
 			fi
@@ -750,18 +746,15 @@ fi
 HASDEFAULNOTIFICATIONE=`ls $CONFIGDIR/custom/默认通知铃声 | wc -l `
 DEFAULNOTIFICATIONDIR=$CONFIGDIR/custom/默认通知铃声
 if [ "$HASDEFAULNOTIFICATIONE" -gt 0 ]; then
-	echo ">>>>>Change default notifications!!"
+	OK " >>>>>Change default notifications!! "
 	cd $DEFAULNOTIFICATIONDIR
 
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
-	if [ -z "$FILES" ];then
-		echo "no default notification source file!!!"
-		return
-	fi
+	
 	if [  $NF -ne $FNF ];then	
-		echo "Rename because any filename has blank!!!"
+		OK " Rename because any filename has blank!!! "
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr " " "_"`
@@ -778,7 +771,7 @@ if [ "$HASDEFAULNOTIFICATIONE" -gt 0 ]; then
 		sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/notifications/'$NOTIFICATIONFILE':system/media/audio/notifications/'$NOTIFICATIONFILE' \\' $SOUNDSDIR/AudioPackage2.mk
 		rm $DEFAULNOTIFICATIONDIR/$NOTIFICATIONFILE
 	else
-		echo "ERROR More than one audio file."
+		OK "${ERROR} ERROR More than one audio file.  "
 	fi
 fi
 ###################################################################################################################################################################################################
@@ -786,24 +779,21 @@ fi
 HASEXTRANOTIFICATION=`ls $CONFIGDIR/custom/备选通知铃声 | wc -l `
 EXTRANOTIFICATIONDIR=$CONFIGDIR/custom/备选通知铃声
 if [ "$HASEXTRANOTIFICATION" -gt 0 ]; then
-	echo ">>>>>Add extra notifications!!"
+	OK " >>>>>Add extra notifications!!  "
 	cd $EXTRANOTIFICATIONDIR
 
 	FILES=`ls`
 	NF=`ls -l |grep "^-"|wc -l`
 	FNF=`echo $FILES | awk '{print NF}'`
-	if [ -z "$FILES" ];then
-		echo "no extra notification source file!!!"
-		return
-	fi
+	
 	if [  $NF -ne $FNF ];then	
-		echo "Rename because any filename has blank!!!"
+		OK " Rename because any filename has blank!!! "
 		for f in `ls ./ | tr " " "\?"`
 		do
 			TARGET=`echo "$f" | tr " " "_"`
 			if [ "$f" != "$TARGET" ];then
 				mv "$f" "$TARGET"
-				echo mv "$f" "$TARGET"
+				OK " mv "$f" "$TARGET" "
 				cp $EXTRANOTIFICATIONDIR/$f $SOUNDSDIR/notifications
 				sed -i '/^PRODUCT_COPY_FILES/a\	\$(LOCAL_PATH)/notifications/'$f':system/media/audio/notifications/'$f' \\' $SOUNDSDIR/AudioPackage2.mk
 			fi
@@ -818,18 +808,8 @@ if [ "$HASEXTRANOTIFICATION" -gt 0 ]; then
 	rm $EXTRANOTIFICATIONDIR/*
 fi
 
-# echo "Begin to build your project?(y/n)"
-# read CMD
-# if [ $CMD = "y" ];then
-# 	cd $SRCDIR
-# 	echo "Build finish $(date +%Y-%m-%d %H:%M:%S)" >> $RECORDFILE
-# 	echo "===============================>>out $RECORDFILE"
-# 	sed -i '/^[#,\/,[:blank:]]/!s/^/#/' $CONFILE
-# 	./make_user_project.sh $PROJECT $1 new	
-# else
-	cd $CONFIGDIR
-	echo "===============================>>out $RECORDFILE"
-	git checkout -- config.ini
-# exit 1
-# fi
+
+cd $CONFIGDIR
+OK "===============================>>out $RECORDFILE "
+git checkout -- config.ini
 
