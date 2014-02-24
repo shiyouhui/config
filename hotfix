@@ -7,7 +7,7 @@ branch=`git branch | awk '{if(match($1,"*")){print $2}}'`
 cd - >/dev/null
 
 echo "------->On branch $branch"
-#`repo status >repo.txt` 
+`repo status >repo.txt` 
 project=`awk  '{if(match($1,"project")){print $2}}' repo.txt`
 if [ ! -z "$project" ];then
 	if [ ! -e $root/PATCH/$branch ];then
