@@ -468,7 +468,7 @@ makelogo()
 			cp -p xganl_$1.bmp $SRCDIR/mediatek/custom/common/lk/logo/xganl/
 		fi
 	fi
-	if [ ! $1=="debug" ];then
+	if [ "$1"!="debug" ];then
 		rm *
 	fi
 	OK " make $1 logo  successfully ===========> OK "
@@ -811,7 +811,7 @@ fi
 ###################################################################################################################################################################################################
 cd $CONFIGDIR
 OK "===============================>>out $RECORDFILE "
-if [ ! $1=="debug" ];then
+if [ "$1"!="debug" ];then
 	git checkout -- config.ini
 fi
 
