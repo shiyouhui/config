@@ -53,6 +53,9 @@ if [ ! -z "$project" ];then
 		echo ----------------------------------------------------$(date +%Y-%m-%d-%H) begin ------------------------------------------------->>$root/PATCH/$branch/log.txt
 		for i in $project
 		do
+			if [ ! -z ${i##*/}  ];then
+				i=${i%/*}/
+			fi
 			cd $i
 			echo "Project $i"
 			echo -------------------------in project $i >>$root/PATCH/$branch/log.txt
