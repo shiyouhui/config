@@ -1,0 +1,52 @@
+#!/bin/sh
+if [ $# != 2 ];then
+	echo "usage  ./pack [project] [packname]"
+	exit 1
+fi
+
+if [ ! -e alps/out ];then
+	echo "No out dir!!!"
+	exit 1
+fi
+
+PROJECT=`expr substr $1 1 2 |tr '[A-Z]' '[a-z]'`
+HOMEDIR=$PWD
+OUTDIR=alps/out/target/product/$1/ 
+DESDIR=$2/$2
+if [ $PROJECT = "mr" ];then
+	Mode_databse1=alps/mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_
+	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6582_S00_MOLY_WR8_W1315_MD_WG_MP_V*
+elif [ $PROJECT = "mc" ]; then
+	Mode_databse1=alps/mediatek/cgen/APDB_MT6572_S01_ALPS.JB3.TABLET.MP_
+	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6572*
+elif [ $PROJECT = "md" ]; then
+	Mode_databse1=alps/mediatek/cgen/APDB_MT6577_S01_MAIN2.1_W10.24
+	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6577_S00_MAUI_11AMD_W12_22_SP_V27*
+elif [ $PROJECT = "mq" ]; then
+	Mode_databse1=alps/mediatek/cgen/APDB_MT6589_S01_MAIN2.1_W10.24_*
+	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6589_S00_MOLY_WR8_W1248_MD_WG_MP_V10_P11
+fi
+	
+DATABASEDIR=$DESDIR/databases
+mkdir -p $DATABASEDIR
+cp $Mode_databse1 $DATABASEDIR
+cp $Mode_databse2 $DATABASEDIR
+cd $OUTDIR
+ALLFILE=`ls -l | grep -v ^d | grep -v "zip" | awk '{print $8}'`
+
+for i in $ALLFILE
+do
+	cp $i $HOMEDIR/$DESDIR
+	echo "cp $i "
+done
+cd $HOMEDIR/$DESDIR
+echo "================>>begin compressing"
+cd ..
+tar czvfh $2.tar.gz $2
+echo "================>>Compressed OK!"
+rm $2 -r
+cd ../
+if [ ! -e ROM ];then
+	mkdir ROM
+fi
+mv $2 ./ROM/$2 -f
