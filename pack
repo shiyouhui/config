@@ -4,6 +4,11 @@ if [ $# != 2 ];then
 	exit 1
 fi
 
+if [ ! -e alps ];then
+	echo "Error exec path!!!"
+	exit 1
+fi
+
 if [ ! -e alps/out ];then
 	echo "No out dir!!!"
 	exit 1

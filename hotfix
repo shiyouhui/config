@@ -1,4 +1,14 @@
 #!/bin/sh
+if [ $# != 0 ];then
+	echo "fatal: usage( hotfix ) no args"
+	exit 1
+fi
+
+if [ ! -e alps ];then
+	echo "Error exec path!!!"
+	exit 1
+fi
+
 echo "------->begin"
 
 root=$PWD

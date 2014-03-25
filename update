@@ -1,8 +1,15 @@
 #!/bin/sh
 if [ $# != 1 ];then
-	echo "fatal: usage( ./update mr12|md77|mq89 )"
+	echo "fatal: usage( update mr12|md77|mq89|mc12 )"
 	exit 1
 fi
+
+if [ ! -e alps ];then
+	echo "Error exec path!!!"
+	exit 1
+fi
+
+
 echo "------->begin update code"
 
 cd alps/system/vold/
