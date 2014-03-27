@@ -26,7 +26,6 @@ if [ ! -z "$project" ];then
 	
 	for i in $project
 	do
-
 		if [ ! -z ${i##*/}  ];then
 			i=${i%/*}/
 		fi
@@ -41,9 +40,14 @@ if [ ! -z "$project" ];then
 				mkdir -p $root/PATCH/$branch/$dir
 			fi
 
-			if [ -e  $j ];then
+			if [ -f  $j ];then
 				cp -rfp $j $root/PATCH/$branch/$target
 				echo "out------->PATCH/$branch/$target"
+			elif [ -d  $j ];then
+				echo "out------->PATCH/$branch/$target"
+				target=${target%/*}
+				target=${target%/*}
+				cp  -rfp $j* $root/PATCH/$branch/$target
 			else
 				if [ -e $root/PATCH/$branch/$target ];then
 					rm $root/PATCH/$branch/$target
