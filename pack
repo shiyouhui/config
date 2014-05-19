@@ -19,8 +19,13 @@ HOMEDIR=$PWD
 OUTDIR=alps/out/target/product/$1/ 
 DESDIR=$2/$2
 if [ $PROJECT = "mr" ];then
-	Mode_databse1=alps/mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_
-	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6582_S00_MOLY_WR8_W1315_MD_WG_MP_V*
+	if [ -e "alps/mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_" ];then
+		Mode_databse1=alps/mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_
+		Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6582_S00_MOLY_WR8_W1315_MD_WG_MP_V*
+	else
+		Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6582_S01_KK1.MP1_
+		Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6582_*
+	fi
 elif [ $PROJECT = "mc" ]; then
 	Mode_databse1=alps/mediatek/cgen/APDB_MT6572_S01_ALPS.JB3.TABLET.MP_
 	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6572*
