@@ -50,6 +50,7 @@ do
 	echo "cp $i "
 done
 cd $HOMEDIR/$DESDIR
+sed -i '0,/is_download/{s/true/false/}' $HOMEDIR/$DESDIR/*_Android_scatter.txt 
 echo "================>>begin compressing"
 cd ..
 tar czvfh $2.tar.gz $2
