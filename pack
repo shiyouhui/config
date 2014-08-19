@@ -35,6 +35,9 @@ elif [ $PROJECT = "md" ]; then
 elif [ $PROJECT = "mq" ]; then
 	Mode_databse1=alps/mediatek/cgen/APDB_MT6589_S01_MAIN2.1_W10.24_*
 	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6589_S00_MOLY_WR8_W1248_MD_WG_MP_V10_P11
+elif [ $PROJECT = "mg" ]; then
+	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6592_S01_KK1.MP1_
+	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6592_*
 fi
 	
 DATABASEDIR=$DESDIR/databases
