@@ -41,6 +41,9 @@ elif [ $PROJECT = "mg" ]; then
 elif [ $PROJECT = "mh" ]; then
 	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6571_S01_KK1.MP7_
 	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6571_*
+elif [ $PROJECT = "m801" ]; then
+	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
+	Mode_databse2=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
 fi
 	
 DATABASEDIR=$DESDIR/databases
