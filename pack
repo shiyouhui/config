@@ -49,7 +49,7 @@ fi
 DATABASEDIR=$DESDIR/databases
 mkdir -p $DATABASEDIR
 cp $Mode_databse1 $DATABASEDIR
-cp $Mode_databse1 $DATABASEDIR
+cp $Mode_databse2 $DATABASEDIR
 cd $OUTDIR
 ALLFILE=`ls -l | grep -v ^d | grep -v "zip" | awk '{print $8}'`
 
