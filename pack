@@ -51,13 +51,14 @@ mkdir -p $DATABASEDIR
 cp $Mode_databse1 $DATABASEDIR
 cp $Mode_databse2 $DATABASEDIR
 cd $OUTDIR
-ALLFILE=`ls -l | grep -v ^d | grep -v "zip" | awk '{print $8}'`
+ALLFILE=`awk '/file_name/{T=$2;next}{if(/is_download/){if(/true/)print T;}}' *_Android_scatter.txt'`
 
 for i in $ALLFILE
 do
 	cp $i $HOMEDIR/$DESDIR
 	echo "cp $i "
 done
+cp *_Android_scatter.txt $HOMEDIR/$DESDIR
 cd $HOMEDIR/$DESDIR
 sed -i '0,/is_download/{s/true/false/}' $HOMEDIR/$DESDIR/*_Android_scatter.txt 
 echo "================>>begin compressing"
