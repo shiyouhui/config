@@ -1,0 +1,81 @@
+#!/bin/bash
+
+###################################################################################################################################################################################################
+#通用打印函数
+OK='\e[0;32m'
+ERROR='\e[1;31m'
+END='\e[0m'
+ERROR()
+{
+	echo -e  "${ERROR} $1 ${END}"
+}
+
+OK()
+{
+	echo -e  "${OK} $1 ${END}"
+}
+###################################################################################################################################################################################################
+
+PROFILE="$1"
+if [ ! -e "$PROFILE" ];then
+	ERROR "No such ProjectConfig.mk file,Please checkout the enter path!"
+	exit
+fi
+
+if [ ${PROFILE##*/} != "ProjectConfig.mk" ];then
+	ERROR "Error path,Please checkout the enter path!(Example:alps/mediatek/config/mr706/elink/MR7065H1C8W1/ProjectConfig.mk)"
+	exit
+fi
+
+TAIL="-"
+ATV=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^HAVE_MATV_FEATURE/)print $2}' $PROFILE`
+DTV=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^HAVE_DTV_NMI326/)print $2}' $PROFILE`
+ALPS=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^CUSTOM_KERNEL_ALSPS/)print $2}' $PROFILE`
+MAGNETOMETER=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^CUSTOM_KERNEL_MAGNETOMETER/)print $2}' $PROFILE`
+HDMI=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^CUSTOM_KERNEL_HDMI/)print $2}' $PROFILE`
+FLASHLIGHT=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^CUSTOM_KERNEL_FLASHLIGHT/)print $2}' $PROFILE`
+HALL=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^HALL_USER_EINT_CONFIG/)print $2}' $PROFILE`
+ELINK_TP_PROXIMITY=`awk -F"=" 'sub(/^[[:blank:]]*/,"",$2){if(/^ELINK_TP_PROXIMITY/)print $2}' $PROFILE`
+
+echo $ATV | grep -q "yes"
+if [  ! -z "$ATV" -a "$?" = "0" ];then
+	TAIL="${TAIL}""A"
+fi
+
+echo $DTV | grep -q "yes"
+if [ ! -z "$DTV" -a "$?" = "0" ];then
+	TAIL="${TAIL}""D"
+fi
+
+echo $ELINK_TP_PROXIMITY | grep -q "no"
+if [ ! -z "$ALPS" -a "$?" = "0" ];then
+	TAIL="${TAIL}""L"
+fi
+
+if [ ! -z "$MAGNETOMETER" ];then
+	TAIL="${TAIL}""M"
+fi
+
+if [ ! -z "$HDMI" ];then
+	TAIL="${TAIL}""I"
+fi
+
+echo $FLASHLIGHT | grep -q "constant"
+if [ ! -z "$FLASHLIGHT" -a "$?" = "0" ];then
+	TAIL="${TAIL}""F"
+fi
+
+echo $HALL | grep -q "yes"
+if [ ! -z "$HALL" -a "$?" = "0" ];then
+	TAIL="${TAIL}""H"
+fi
+
+if [ "$TAIL" = "-" ];then
+	echo
+	ERROR TAIL="NULL"
+	echo
+else
+	echo
+	OK $TAIL
+	echo
+fi
