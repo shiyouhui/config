@@ -51,7 +51,7 @@ mkdir -p $DATABASEDIR
 cp $Mode_databse1 $DATABASEDIR
 cp $Mode_databse2 $DATABASEDIR
 cd $OUTDIR
-ALLFILE=`awk '/file_name/{T=$2;next}{if(/is_download/){if(/true/)print T;}}' *_Android_scatter.txt'`
+ALLFILE=`awk '/file_name/{T=$2;next}{if(/is_download/){if(/true/)print T;}}' *_Android_scatter.txt`
 
 for i in $ALLFILE
 do
