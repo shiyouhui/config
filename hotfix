@@ -85,3 +85,5 @@ if [ ! -z "$project" ];then
 else
 	echo "nothing to commit (working directory clean)"
 fi
+cd $root
+rm repo.txt
