@@ -15,6 +15,7 @@ if [ ! -e alps/out ];then
 fi
 
 PROJECT=`expr substr $1 1 2 |tr '[A-Z]' '[a-z]'`
+PROJECT_SUB=`expr substr $1 1 1 |tr '[A-Z]' '[a-z]'`
 HOMEDIR=$PWD
 OUTDIR=alps/out/target/product/$1/ 
 DESDIR=$2/$2
@@ -31,10 +32,10 @@ elif [ $PROJECT = "mc" ]; then
 	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6572*
 elif [ $PROJECT = "md" ]; then
 	Mode_databse1=alps/mediatek/cgen/APDB_MT6577_S01_MAIN2.1_W10.24
-	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6577_S00_MAUI_11AMD_W12_22_SP_V27*
+	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6577_*
 elif [ $PROJECT = "mq" ]; then
 	Mode_databse1=alps/mediatek/cgen/APDB_MT6589_S01_MAIN2.1_W10.24_*
-	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6589_S00_MOLY_WR8_W1248_MD_WG_MP_V10_P11
+	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6589*
 elif [ $PROJECT = "mg" ]; then
 	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6592_S01_KK1.MP1_
 	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6592_*
@@ -44,6 +45,18 @@ elif [ $PROJECT = "mh" ]; then
 elif [ $PROJECT = "m8" ]; then
 	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
 	Mode_databse2=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
+elif [ $PROJECT = "q8" ]; then
+	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
+	Mode_databse2=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
+elif [ $PROJECT_SUB = "c" ]; then
+	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6572_S01_KK1.MP7_
+	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6572_*
+elif [ $PROJECT = "mt" ]; then
+	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6572_S01_KK1.MP7_
+	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6572_*
+elif [ $PROJECT_SUB = "v" ]; then
+	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6752_S01_KK2.MP13_
+	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6752_*
 fi
 	
 DATABASEDIR=$DESDIR/databases
