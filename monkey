@@ -370,13 +370,13 @@ makeanimation()
 
 	if [ $1 = "boot" ];then
 		echo "$WIDTH $HEIGHT $BOOTFPS" > desc.txt
-		for i in `ls -l | grep "^d" | awk '{print $8}'`
+		for i in `ls -l | grep "^d" | awk '{print $9}'`
 		do
 			echo "p $BOOTTIMES 0 $i" >> desc.txt
 		done
 	elif [ $1 = "shut" ];then
 		echo "$WIDTH $HEIGHT $SHUTFPS" > desc.txt
-		for i in `ls -l | grep "^d" | awk '{print $8}'`
+		for i in `ls -l | grep "^d" | awk '{print $9}'`
 		do
 			echo "p $SHUTTIMES 0 $i" >> desc.txt
 		done
