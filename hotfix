@@ -42,7 +42,7 @@ if [ ! -z "$project" ];then
 			target=$i$j
 			target=${target#*/}
 			dir=${target%/*}
-			if [ ! -e  $root/PATCH/$branch/$DEST/$dir ];then
+			if [ -e  $j ];then
 				mkdir -p $root/PATCH/$branch/$DEST/$dir
 			fi
 
