@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ $# != 2 ];then
 	echo "usage  ./pack [project] [packname]"
 	exit 1
@@ -14,50 +14,27 @@ if [ ! -e alps/out ];then
 	exit 1
 fi
 
-PROJECT=`expr substr $1 1 2 |tr '[A-Z]' '[a-z]'`
-PROJECT_SUB=`expr substr $1 1 1 |tr '[A-Z]' '[a-z]'`
+ELINK_PROJECT=$1
+TARGET=$2
 HOMEDIR=$PWD
-OUTDIR=alps/out/target/product/$1/ 
-DESDIR=$2/$2
-if [ $PROJECT = "mr" ];then
-	if [ -e "alps/mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_" ];then
-		Mode_databse1=alps/mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_
-		Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6582_S00_MOLY_WR8_W1315_MD_WG_MP_V*
-	else
-		Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6582_S01_KK1.MP1_
-		Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6582_*
-	fi
-elif [ $PROJECT = "mc" ]; then
-	Mode_databse1=alps/mediatek/cgen/APDB_MT6572_S01_ALPS.JB3.TABLET.MP_
-	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6572*
-elif [ $PROJECT = "md" ]; then
-	Mode_databse1=alps/mediatek/cgen/APDB_MT6577_S01_MAIN2.1_W10.24
-	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6577_*
-elif [ $PROJECT = "mq" ]; then
-	Mode_databse1=alps/mediatek/cgen/APDB_MT6589_S01_MAIN2.1_W10.24_*
-	Mode_databse2=alps/mediatek/config/out/$1/modem/BPLGUInfoCustomAppSrcP_MT6589*
-elif [ $PROJECT = "mg" ]; then
-	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6592_S01_KK1.MP1_
-	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6592_*
-elif [ $PROJECT = "mh" ]; then
-	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6571_S01_KK1.MP7_
-	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6571_*
-elif [ $PROJECT = "m8" ]; then
-	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
-	Mode_databse2=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
-elif [ $PROJECT = "q8" ]; then
-	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
-	Mode_databse2=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT8127_S01_KK1.MP10_
-elif [ $PROJECT_SUB = "c" ]; then
-	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6572_S01_KK1.MP7_
-	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6572_*
-elif [ $PROJECT = "mt" ]; then
-	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6572_S01_KK1.MP7_
-	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6572_*
-elif [ $PROJECT_SUB = "v" ]; then
-	Mode_databse1=alps/out/target/product/$1/obj/CODEGEN/cgen/APDB_MT6752_S01_KK2.MP13_
-	Mode_databse2=alps/out/target/product/$1/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP_MT6752_*
+OUTDIR=alps/out/target/product/$ELINK_PROJECT/ 
+
+if [ ! -e "$OUTDIR" ];then
+	echo "$OUTDIR not found!!!"
+	exit 1
 fi
+
+DESDIR=$TARGET/$TARGET
+if [ -e "alps/mediatek/cgen/APDB_MT6582_S01_ALPS.JB5.TABLET.MP_" ];then
+	Mode_databse1=alps/mediatek/cgen/APDB_*
+	Mode_databse2=alps/mediatek/config/out/$ELINK_PROJECT/modem/BPLGUInfoCustomAppSrcP*
+elif [ -e "alps/out/target/product/$ELINK_PROJECT/obj/CODEGEN/" ];then
+	Mode_databse1=alps/out/target/product/$ELINK_PROJECT/obj/CODEGEN/cgen/APDB_*
+	Mode_databse2=alps/out/target/product/$ELINK_PROJECT/obj/CUSTGEN/config/modem/BPLGUInfoCustomAppSrcP*
+elif [ -e "alps/out/target/product/$ELINK_PROJECT/obj/CGEN/" ];then
+	Mode_databse1=alps/out/target/product/$ELINK_PROJECT/obj/CGEN/APDB_*
+	Mode_databse2=alps/out/target/product/$ELINK_PROJECT/system/etc/mddb/BPLGUInfoCustomAppSrcP*
+fi	
 	
 DATABASEDIR=$DESDIR/databases
 mkdir -p $DATABASEDIR
@@ -71,16 +48,17 @@ do
 	cp $i $HOMEDIR/$DESDIR
 	echo "cp $i "
 done
+rm $HOMEDIR/$DESDIR/databases/*_ENUM
 cp *_Android_scatter.txt $HOMEDIR/$DESDIR
 cd $HOMEDIR/$DESDIR
-sed -i '0,/is_download/{s/true/false/}' $HOMEDIR/$DESDIR/*_Android_scatter.txt 
+#sed -i '0,/is_download/{s/true/false/}' $HOMEDIR/$DESDIR/*_Android_scatter.txt 
 echo "================>>begin compressing"
 cd ..
-tar czvfh $2.tar.gz $2
+tar czvfh $TARGET.tar.gz $TARGET
 echo "================>>Compressed OK!"
-rm $2 -r
+rm $TARGET -r
 cd ../
 if [ ! -e ROM ];then
 	mkdir ROM
 fi
-mv $2 ./ROM/$2 -f
+mv $TARGET ./ROM/$TARGET -f
