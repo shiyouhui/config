@@ -65,10 +65,10 @@ if [ ! -z "$project" ];then
 		cd $root
 	done
 	echo "------->finish"
-	echo "自动提交?(y/n)"
+	echo "auto commit?(y/n)"
 	read CMD
 	if [ "$CMD" = "y" ];then
-		echo "备注内容:"
+		echo "Comment:"
 		read CONTENT
 		for i in $project
 		do
