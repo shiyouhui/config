@@ -1,11 +1,24 @@
 #!/bin/sh
+OK='\e[0;32m'
+ERROR='\e[1;31m'
+END='\e[0m'
+ERROR()
+{
+	echo -e  "${ERROR} $1 ${END}"
+}
+
+OK()
+{
+	echo -e  "${OK} $1 ${END}"
+}
+
 if [ $# != 0 ];then
-	echo "fatal: usage( hotfix ) no args"
+	ERROR "fatal: usage( hotfix ) no args"
 	exit 1
 fi
 
 if [ ! -e alps ];then
-	echo "Error exec path!!!"
+	ERROR "Error exec path!!!"
 	exit 1
 fi
 

@@ -1,11 +1,24 @@
-#!/bin/sh
+#!/bin/bash
+OK='\e[0;32m'
+ERROR='\e[1;31m'
+END='\e[0m'
+ERROR()
+{
+	echo -e  "${ERROR} $1 ${END}"
+}
+
+OK()
+{
+	echo -e  "${OK} $1 ${END}"
+}
+
 if [ $# != 1 ];then
-	echo "fatal: usage( update mr12|md77|mq89|mc12 )"
+	ERROR "fatal: usage( update mr12|md77|mq89|mc12 )"
 	exit 1
 fi
 
 if [ ! -e alps ];then
-	echo "Error exec path!!!"
+	ERROR "Error exec path!!!"
 	exit 1
 fi
 
@@ -15,19 +28,28 @@ echo "------->begin update code"
 cd alps/system/vold/
 branch=`git branch | awk '{if(match($1,"*")){print $2}}'`
 cd - >/dev/null
+echo "------->On branch $branch"
 
 repo checkout mtk
+if [ $? == 1 ];then
+	
+	ERROR "Your code has any files changed but not commit,you can use the following command fix it:
+	1.hotfix
+	2.repo forall -c git checkout -- .
+	3.repo forall -c git clean -fd"
+	OK "Rollback code...."
+	repo checkout $branch
+	exit
+fi
 repo sync
 repo abandon elink_sw
 repo forall -c git checkout -b elink_sw $1/elink_sw
-#file1=`ls  alps/mediatek/config/common/make_user_project.sh -l | awk '{print $6}'`
-#file2=`ls  alps/make_user_project.sh -l | awk '{print $6}'`
-#if [ "$file1" != "$file2" ];then
-#	cp  alps/mediatek/config/common/make_user_project.sh alps/ 
-#	echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>build script had updated!!!!!!"
-#fi
-#grep "CUSTOM_BUILD_VERNO" alps/mediatek/config/common/ProjectConfig.mk > code_version.txt
 repo checkout $branch
+RET=`cat code_version.txt | awk -v foo=$branch '{if(match($1,foo))print $2}'`
+if [ ! -z "$RET"  ];then
+	sed -i "/^"$branch"/s/$RET/$(date +%Y-%m-%d-%H)/" code_version.txt
+else
+	echo $branch $(date +%Y-%m-%d-%H) >> code_version.txt
+fi
 
-echo UPDATE_TIME = $(date +%Y-%m-%d-%H) >> code_version.txt
 echo "------->update code succesfully!"
