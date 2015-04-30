@@ -1,0 +1,61 @@
+#!/bin/bash
+
+if [ $# != 1 ];then
+	echo "usage  ./fetch lo82"
+	exit 1
+fi
+
+ELINK_PROJECT=$1
+
+if [ -e .repo ];then
+	echo "This dir have a .repo floder, delete ? (y/n)"
+	read CMD
+	if [ "$CMD" = "y" ];then
+		rm .repo -rf
+	else
+		exit 1
+	fi
+fi
+
+if [ "$ELINK_PROJECT" = "mr12" -o "$ELINK_PROJECT" = "md77" -o "$ELINK_PROJECT" = "mq89" -o "$ELINK_PROJECT" = "kk12cw" ];then
+	repo init -u elink-code-server@192.168.2.96:/elink_code/sda/"$ELINK_PROJECT"/manifest.git;
+elif [ "$ELINK_PROJECT" = "mrx2" -o "$ELINK_PROJECT" = "kk27" -o "$ELINK_PROJECT" = "kk72" -o "$ELINK_PROJECT" = "kk92" -o "$ELINK_PROJECT" = "kk52" -o "$ELINK_PROJECT" = "mc12" -o "$ELINK_PROJECT" = "kk12d" -o "$ELINK_PROJECT" = "lo27" -o "$ELINK_PROJECT" = "lo82" -o "$ELINK_PROJECT" = "lo52" -o "$ELINK_PROJECT" = "lo35" -o "$ELINK_PROJECT" = "lo35m" ];then
+	repo init -u elink-code-server@192.168.2.96:/elink_code/sdb/"$ELINK_PROJECT"/manifest.git;
+else
+	repo init -u elink-code-server@192.168.2.96:/elink_code/sdb/"$ELINK_PROJECT"/manifest.git;
+fi
+
+repo sync;
+repo start mtk --all;
+repo forall -c git checkout -b elink_sw "$ELINK_PROJECT"/elink_sw;
+
+cd alps
+if [ -e docs/mtk/make_project.sh ];then
+	ln -s docs/mtk/make_project.sh make_project
+fi
+
+if [ -e docs/mtk/make_user_project.sh ];then
+	ln -s docs/mtk/make_user_project.sh make_user_project
+fi
+
+if [ -e docs/mtk/pack_user_project.sh ];then
+	ln -s docs/mtk/pack_user_project.sh pack_user_project
+fi
+
+if [ -e mediatek/config/common/make_project.sh ];then
+	ln -s mediatek/config/common/make_project.sh make_project
+fi
+
+if [ -e mediatek/config/common/make_user_project.sh ];then
+	ln -s mediatek/config/common/make_user_project.sh make_user_project
+fi
+
+if [ -e mediatek/config/common/pack_user_project.sh ];then
+	ln -s mediatek/config/common/pack_user_project.sh pack_user_project
+fi
+
+
+
+
+
+
