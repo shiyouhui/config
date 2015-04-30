@@ -38,8 +38,8 @@ if [ -e docs/mtk/make_user_project.sh ];then
 	ln -s docs/mtk/make_user_project.sh make_user_project
 fi
 
-if [ -e docs/mtk/pack_user_project.sh ];then
-	ln -s docs/mtk/pack_user_project.sh pack_user_project
+if [ -e docs/mtk/pack_user_image.sh ];then
+	ln -s docs/mtk/pack_user_image.sh pack_user_image
 fi
 
 if [ -e mediatek/config/common/make_project.sh ];then
@@ -50,8 +50,8 @@ if [ -e mediatek/config/common/make_user_project.sh ];then
 	ln -s mediatek/config/common/make_user_project.sh make_user_project
 fi
 
-if [ -e mediatek/config/common/pack_user_project.sh ];then
-	ln -s mediatek/config/common/pack_user_project.sh pack_user_project
+if [ -e mediatek/config/common/pack_user_image.sh ];then
+	ln -s mediatek/config/common/pack_user_image.sh pack_user_image
 fi
 
 
