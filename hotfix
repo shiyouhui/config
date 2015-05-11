@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 OK='\e[0;32m'
 ERROR='\e[1;31m'
 END='\e[0m'
@@ -12,91 +12,136 @@ OK()
 	echo -e  "${OK} $1 ${END}"
 }
 
-if [ $# != 0 ];then
-	ERROR "fatal: usage( hotfix ) no args"
-	exit 1
-fi
-
 if [ ! -e alps ];then
 	ERROR "Error exec path!!!"
 	exit 1
 fi
 
-echo "------->begin"
-
 root=$PWD
 cd alps/system/vold/
 branch=`git branch | awk '{if(match($1,"*")){print $2}}'`
+if [ $# != 0 ];then
+	RETSUT=`git branch | grep $1`
+	if [ -z "$RETSUT" ];then
+		ERROR "No found this branch!!!"
+		exit
+	fi
+fi
 cd - >/dev/null
 
-echo "------->On branch $branch"
-`repo status >repo.txt` 
-project=`awk  '{if(match($1,"project")){print $2}}' repo.txt`
-if [ ! -z "$project" ];then
-	if [ ! -e $root/PATCH/$branch ];then
-		mkdir -p $root/PATCH/$branch
-	fi
-	TIME=`date +%Y%m%d%H%M`
-	DEST=Patch_"$TIME"
-	mkdir -p $root/PATCH/$branch/$DEST
-	mv repo.txt $root/PATCH/$branch/$DEST/repo_"$TIME".txt
-	for i in $project
+if [ $# != 0 ];then
+	SUBPROJECT=`repo list | awk -F":" '{print $1}'`
+	DEST=$root/PATCH/Diff-\("$branch"\)_\("$1"\)
+	mkdir -p $DEST
+	for i in $SUBPROJECT
 	do
-		if [ ! -z ${i##*/}  ];then
-			i=${i%/*}/
-		fi
 		cd $i
-		subfiles=`git status -s | awk '{print $NF}'`
-		echo "######################################################in project $i ######################################################\n">>$root/PATCH/$branch/$DEST/log_"$TIME".txt
-		git diff >>$root/PATCH/$branch/$DEST/log_"$TIME".txt
-		echo "\n######################################################  END  ######################################################\n">>$root/PATCH/$branch/$DEST/log_"$TIME".txt
+		#if [ ! -z ${i##*/}  ];then
+		#	i=${i%/*}/
+		#fi
+		subfiles=`git diff --name-only $1`
+		echo "######################################################in project $i ######################################################\n">>$DEST/log.txt
+		git diff $1 >>$DEST/log.txt
+		echo "\n######################################################  END  ######################################################\n">>$DEST/log.txt
+		
 		for j in $subfiles
 		do
-			target=$i$j
+			target=$i/$j
+			
 			target=${target#*/}
 			dir=${target%/*}
 			if [ -e  $j ];then
-				mkdir -p $root/PATCH/$branch/$DEST/$dir
+				mkdir -p $DEST/$dir
 			fi
-
+		
 			if [ -f  $j ];then
-				cp -rfp $j $root/PATCH/$branch/$DEST/$target
-				echo "out------->PATCH/$branch/$DEST/$target"
+				cp -rfp $j $DEST/$target
+				echo "out------->$DEST/$target"
 			elif [ -d  $j ];then
-				echo "out------->PATCH/$branch/$DEST/$target"
+				echo "out------->$DEST/$target"
 				target=${target%/*}
 				target=${target%/*}
-				cp  -rfp $j $root/PATCH/$branch/$DEST/$target
+				cp  -rfp $j $DEST/$target
 			else
-				if [ -e $root/PATCH/$branch/$DEST/$target ];then
-					rm $root/PATCH/$branch/$DEST/$target
-					echo "delete------->PATCH/$branch/$DEST/$target"
+				if [ -e $DEST/$target ];then
+					rm $DEST/$target
+					echo "delete------->$DEST/$target"
 				fi
 			fi
 		done
-		
-		cd $root
+		cd - >> /dev/null
 	done
-	echo "------->finish"
-	echo "auto commit?(y/n)"
-	read CMD
-	if [ "$CMD" = "y" ];then
-		echo "Comment:"
-		read CONTENT
+else
+	echo "------->begin"
+	echo "------->On branch $branch"
+	`repo status >repo.txt` 
+	project=`awk  '{if(match($1,"project")){print $2}}' repo.txt`
+	if [ ! -z "$project" ];then
+		if [ ! -e $root/PATCH/$branch ];then
+			mkdir -p $root/PATCH/$branch
+		fi
+		TIME=`date +%Y%m%d%H%M`
+		DEST=Patch_"$TIME"
+		mkdir -p $root/PATCH/$branch/$DEST
+		mv repo.txt $root/PATCH/$branch/$DEST/repo_"$TIME".txt
 		for i in $project
 		do
 			if [ ! -z ${i##*/}  ];then
 				i=${i%/*}/
 			fi
 			cd $i
-			echo "Project $i"
-			git add .
-			git commit -am "$CONTENT"
+			subfiles=`git status -s | awk '{print $NF}'`
+			echo "######################################################in project $i ######################################################\n">>$root/PATCH/$branch/$DEST/log_"$TIME".txt
+			git diff >>$root/PATCH/$branch/$DEST/log_"$TIME".txt
+			echo "\n######################################################  END  ######################################################\n">>$root/PATCH/$branch/$DEST/log_"$TIME".txt
+			for j in $subfiles
+			do
+				target=$i$j
+				target=${target#*/}
+				dir=${target%/*}
+				if [ -e  $j ];then
+					mkdir -p $root/PATCH/$branch/$DEST/$dir
+				fi
+	
+				if [ -f  $j ];then
+					cp -rfp $j $root/PATCH/$branch/$DEST/$target
+					echo "out------->PATCH/$branch/$DEST/$target"
+				elif [ -d  $j ];then
+					echo "out------->PATCH/$branch/$DEST/$target"
+					target=${target%/*}
+					target=${target%/*}
+					cp  -rfp $j $root/PATCH/$branch/$DEST/$target
+				else
+					if [ -e $root/PATCH/$branch/$DEST/$target ];then
+						rm $root/PATCH/$branch/$DEST/$target
+						echo "delete------->PATCH/$branch/$DEST/$target"
+					fi
+				fi
+			done
+			
 			cd $root
 		done
+		echo "------->finish"
+		echo "auto commit?(y/n)"
+		read CMD
+		if [ "$CMD" = "y" ];then
+			echo "Comment:"
+			read CONTENT
+			for i in $project
+			do
+				if [ ! -z ${i##*/}  ];then
+					i=${i%/*}/
+				fi
+				cd $i
+				echo "Project $i"
+				git add .
+				git commit -am "$CONTENT"
+				cd $root
+			done
+		else
+			exit 1
+		fi
 	else
-		exit 1
+		echo "nothing to commit (working directory clean)"
 	fi
-else
-	echo "nothing to commit (working directory clean)"
 fi
