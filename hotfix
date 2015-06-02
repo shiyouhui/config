@@ -100,25 +100,50 @@ else
 				target=${target#*/}
 				dir=${target%/*}
 				if [ -e  $j ];then
-					mkdir -p $root/PATCH/$branch/$DEST/$dir
+					mkdir -p $root/PATCH/$branch/$DEST/current/$dir
 				fi
 	
 				if [ -f  $j ];then
-					cp -rfp $j $root/PATCH/$branch/$DEST/$target
-					echo "out------->PATCH/$branch/$DEST/$target"
+					cp -rfp $j $root/PATCH/$branch/$DEST/current/$target
+					echo "out------->PATCH/$branch/$DEST/current/$target"
 				elif [ -d  $j ];then
-					echo "out------->PATCH/$branch/$DEST/$target"
+					echo "out------->PATCH/$branch/$DEST/current/$target"
 					target=${target%/*}
 					target=${target%/*}
-					cp  -rfp $j $root/PATCH/$branch/$DEST/$target
+					cp  -rfp $j $root/PATCH/$branch/$DEST/current/$target
 				else
-					if [ -e $root/PATCH/$branch/$DEST/$target ];then
-						rm $root/PATCH/$branch/$DEST/$target
-						echo "delete------->PATCH/$branch/$DEST/$target"
+					if [ -e $root/PATCH/$branch/$DEST/current/$target ];then
+						rm $root/PATCH/$branch/$DEST/current/$target
+						echo "delete------->PATCH/$branch/$DEST/current/$target"
 					fi
 				fi
 			done
-			
+			git stash
+			for j in $subfiles
+			do
+				target=$i$j
+				target=${target#*/}
+				dir=${target%/*}
+				if [ -e  $j ];then
+					mkdir -p $root/PATCH/$branch/$DEST/before/$dir
+				fi
+	
+				if [ -f  $j ];then
+					cp -rfp $j $root/PATCH/$branch/$DEST/before/$target
+					echo "out------->PATCH/$branch/$DEST/before/$target"
+				elif [ -d  $j ];then
+					echo "out------->PATCH/$branch/$DEST/before/$target"
+					target=${target%/*}
+					target=${target%/*}
+					cp  -rfp $j $root/PATCH/$branch/$DEST/before/$target
+				else
+					if [ -e $root/PATCH/$branch/$DEST/before/$target ];then
+						rm $root/PATCH/$branch/$DEST/before/$target
+						echo "delete------->PATCH/$branch/$DEST/before/$target"
+					fi
+				fi
+			done
+			git stash pop
 			cd $root
 		done
 		echo "------->finish"
