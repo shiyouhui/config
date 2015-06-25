@@ -2,6 +2,27 @@
 
 if [ $# != 1 ];then
 	echo "usage  ./fetch lo82"
+	echo "MT8312C       4.2 ----> mc12"
+	echo "MT8312/MT8382 4.2 ----> mr12"
+	echo ""
+	echo "MT8312/MT8382 4.4 ----> mrx2"
+	echo "MT8392        4.4 ----> kk92"
+	echo "MT8127        4.4 ----> kk27"
+	echo "MT6572        4.4 ----> kk72"
+	echo "MT8312CW      4.4 ----> kk12cw"
+	echo "MT8752        4.4 ----> kk52"
+	echo "MT8312D       4.4 ----> kk12d"
+	echo ""
+	echo "MT8752        5.0 ----> lo52"
+	echo "MT8312/MT8382 5.0 ----> lo82"
+	echo "MT8127        5.0 ----> lo27"
+	echo "MT8735        5.0 ----> lo35"
+	echo ""
+	echo "MT8735M       5.1 ----> lo35m"
+	echo "MT8312C       5.1 ----> l1_8312c"
+	echo "MT8127        5.1 ----> l1_8127"
+	echo "MT8163        5.1 ----> l1_8163"
+	echo "MT8321        5.1 ----> l1_8121"
 	exit 1
 fi
 
@@ -31,27 +52,27 @@ repo forall -c git checkout -b elink_sw "$ELINK_PROJECT"/elink_sw;
 
 cd alps
 if [ -e docs/mtk/make_project.sh ];then
-	ln -s docs/mtk/make_project.sh make_project
+	ln  docs/mtk/make_project.sh make_project
 fi
 
 if [ -e docs/mtk/make_user_project.sh ];then
-	ln -s docs/mtk/make_user_project.sh make_user_project
+	ln  docs/mtk/make_user_project.sh make_user_project
 fi
 
 if [ -e docs/mtk/pack_user_image.sh ];then
-	ln -s docs/mtk/pack_user_image.sh pack_user_image
+	ln  docs/mtk/pack_user_image.sh pack_user_image
 fi
 
 if [ -e mediatek/config/common/make_project.sh ];then
-	ln -s mediatek/config/common/make_project.sh make_project
+	ln  mediatek/config/common/make_project.sh make_project
 fi
 
 if [ -e mediatek/config/common/make_user_project.sh ];then
-	ln -s mediatek/config/common/make_user_project.sh make_user_project
+	ln  mediatek/config/common/make_user_project.sh make_user_project
 fi
 
 if [ -e mediatek/config/common/pack_user_image.sh ];then
-	ln -s mediatek/config/common/pack_user_image.sh pack_user_image
+	ln mediatek/config/common/pack_user_image.sh pack_user_image
 fi
 
 

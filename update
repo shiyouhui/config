@@ -34,9 +34,15 @@ repo checkout mtk
 if [ $? == 1 ];then
 	
 	ERROR "Your code has any files changed but not commit,you can use the following command fix it:
+	1.repo forall -c git stash
+		then update finish exec
+	2.repo forall -c git stash pop
+	
+	or
 	1.hotfix
 	2.repo forall -c git checkout -- .
 	3.repo forall -c git clean -fd"
+	
 	OK "Rollback code...."
 	repo checkout $branch
 	exit
