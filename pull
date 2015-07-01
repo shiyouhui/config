@@ -1,0 +1,63 @@
+#!/bin/bash
+OK='\e[0;32m'
+ERROR='\e[1;31m'
+END='\e[0m'
+ERROR()
+{
+	echo -e  "${ERROR} $1 ${END}"
+}
+
+OK()
+{
+	echo -e  "${OK} $1 ${END}"
+}
+
+if [ ! -e .git ];then
+	ERROR "Error exec path!!!"
+	exit 1
+fi
+
+root=$PWD
+
+if [ $# != 0 ];then
+	RETSUT=`git log | grep $1`
+	if [ -z "$RETSUT" ];then
+		ERROR "No found this commit!!!"
+		exit
+	fi
+fi
+
+DEST=$root/PATCH/Commit-$1
+mkdir -p $DEST
+
+subfiles=`git diff --name-only $1 $1^`
+git checkout $1
+for j in $subfiles
+do
+	target=$i/$j
+	
+	target=${target#*/}
+	dir=${target%/*}
+	if [ -e  $j ];then
+		mkdir -p $DEST/$dir
+	fi
+
+	if [ -f  $j ];then
+		cp -rfp $j $DEST/$target
+		echo "out------->$DEST/$target"
+	elif [ -d  $j ];then
+		echo "out------->$DEST/$target"
+		target=${target%/*}
+		target=${target%/*}
+		cp  -rfp $j $DEST/$target
+	else
+		if [ -e $DEST/$target ];then
+			rm $DEST/$target
+			echo "delete------->$DEST/$target"
+		fi
+	fi
+done
+git checkout .
+
+
+
