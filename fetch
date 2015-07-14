@@ -23,6 +23,7 @@ if [ $# != 1 ];then
 	echo "MT8127        5.1 ----> l1_8127"
 	echo "MT8163        5.1 ----> l1_8163"
 	echo "MT8321        5.1 ----> l1_8121"
+	echo "MT8735x       5.1 ----> l1_8735x"
 	exit 1
 fi
 
@@ -52,7 +53,7 @@ repo forall -c git checkout -b elink_sw "$ELINK_PROJECT"/elink_sw;
 
 cd alps
 if [ -e docs/mtk/make_project.sh ];then
-	ln  docs/mtk/make_project.sh make_project
+	cp -rf  docs/mtk/make_project.sh make_project
 fi
 
 if [ -e docs/mtk/make_user_project.sh ];then
@@ -60,19 +61,19 @@ if [ -e docs/mtk/make_user_project.sh ];then
 fi
 
 if [ -e docs/mtk/pack_user_image.sh ];then
-	ln  docs/mtk/pack_user_image.sh pack_user_image
+	cp -rf  docs/mtk/pack_user_image.sh pack_user_image
 fi
 
 if [ -e mediatek/config/common/make_project.sh ];then
-	ln  mediatek/config/common/make_project.sh make_project
+	cp -rf  mediatek/config/common/make_project.sh make_project
 fi
 
 if [ -e mediatek/config/common/make_user_project.sh ];then
-	ln  mediatek/config/common/make_user_project.sh make_user_project
+	cp -rf  mediatek/config/common/make_user_project.sh make_user_project
 fi
 
 if [ -e mediatek/config/common/pack_user_image.sh ];then
-	ln mediatek/config/common/pack_user_image.sh pack_user_image
+	cp -rf mediatek/config/common/pack_user_image.sh pack_user_image
 fi
 
 
