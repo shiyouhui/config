@@ -91,6 +91,7 @@ else
 			fi
 			cd $i
 			subfiles=`git status -s | awk '{print $NF}'`
+            subfiles_nountrack=`git status -s -uno | awk '{print $NF}'`
 			echo "######################################################in project $i ######################################################\n">>$root/PATCH/$branch/$DEST/log_"$TIME".txt
 			git diff >>$root/PATCH/$branch/$DEST/log_"$TIME".txt
 			echo "\n######################################################  END  ######################################################\n">>$root/PATCH/$branch/$DEST/log_"$TIME".txt
@@ -119,7 +120,7 @@ else
 				fi
 			done
 			git stash
-			for j in $subfiles
+			for j in $subfiles_nountrack
 			do
 				target=$i$j
 				target=${target#*/}
